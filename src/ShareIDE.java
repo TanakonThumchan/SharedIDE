@@ -99,9 +99,12 @@ public class ShareIDE extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    //evento textbox per la scrittura 
     private void txtCodeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtCodeCaretUpdate
-
+        String buffer;
+        buffer=txtCode.getText();
+        JOptionPane.showMessageDialog(null, buffer);
     }//GEN-LAST:event_txtCodeCaretUpdate
 
     private void btnDebugMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDebugMouseClicked
