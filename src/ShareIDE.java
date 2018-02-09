@@ -13,6 +13,7 @@ public class ShareIDE extends javax.swing.JFrame {
 
     public ShareIDE() {
         initComponents();
+        txtCode.getDocument().addDocumentListener(new MyDocumentListener());
     }
 
     @SuppressWarnings("unchecked")
@@ -104,7 +105,7 @@ public class ShareIDE extends javax.swing.JFrame {
     private void txtCodeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtCodeCaretUpdate
         String buffer;
         buffer=txtCode.getText();
-        JOptionPane.showMessageDialog(null, buffer);
+        //JOptionPane.showMessageDialog(null, buffer);
     }//GEN-LAST:event_txtCodeCaretUpdate
 
     private void btnDebugMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDebugMouseClicked
@@ -153,7 +154,8 @@ public class ShareIDE extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+        }     
+   
         //</editor-fold>
 
         /* Create and display the form */
