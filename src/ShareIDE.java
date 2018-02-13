@@ -1,8 +1,10 @@
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -122,10 +124,18 @@ public class ShareIDE extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCodeCaretUpdate
 
     private void btnDebugMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDebugMouseClicked
-        String buffer;
+        String buffer=new String();
         String temp = "";
+        try(  PrintWriter out = new PrintWriter( "filename.java" )  )
+            {
+                buffer=txtCode.getText();
+                out.println( buffer );
+            } catch (FileNotFoundException ex) {
+            Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
+            }
         try {
-            String command = "cmd /c echo ciao";
+            buffer= new String();
+            String command = "cmd /c javac Filename.java";
             Process child = Runtime.getRuntime().exec(command);
 //            OutputStream out = child.getOutputStream();
             InputStream in = child.getInputStream();
@@ -133,8 +143,19 @@ public class ShareIDE extends javax.swing.JFrame {
             while ((buffer = readd.readLine()) != null) {
                 temp += buffer; // lettura risposta del cmd
             }
+            InputStream stderr = child.getErrorStream(); // Ottengo lo stream dell'errore
+            BufferedReader br = new BufferedReader(new InputStreamReader(stderr));
+            buffer= new String();
+            System.out.println("<ERROR>");
+            while ( (buffer = br.readLine()) != null)
+                System.out.println(buffer);
+            System.out.println("</ERROR>");
+            int exitVal = child.waitFor(); // Se exitVal=0 tutto ok se è diverso da 0 c'è qualche errore
+            System.out.println("Process exitValue: " + exitVal);
             JOptionPane.showMessageDialog(null, temp);
         } catch (IOException ex) {
+            Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnDebugMouseClicked
