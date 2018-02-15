@@ -25,7 +25,9 @@ public class ShareIDE extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         txtCode = new javax.swing.JTextArea();
-        btnDebug = new javax.swing.JButton();
+        btnCompila = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        txtReturn = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -44,6 +46,7 @@ public class ShareIDE extends javax.swing.JFrame {
 
         txtCode.setColumns(20);
         txtCode.setRows(5);
+        txtCode.setTabSize(4);
         txtCode.addCaretListener(new javax.swing.event.CaretListener() {
             public void caretUpdate(javax.swing.event.CaretEvent evt) {
                 txtCodeCaretUpdate(evt);
@@ -51,12 +54,17 @@ public class ShareIDE extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(txtCode);
 
-        btnDebug.setText("Debug");
-        btnDebug.addMouseListener(new java.awt.event.MouseAdapter() {
+        btnCompila.setText("Compila");
+        btnCompila.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                btnDebugMouseClicked(evt);
+                btnCompilaMouseClicked(evt);
             }
         });
+
+        txtReturn.setEditable(false);
+        txtReturn.setColumns(20);
+        txtReturn.setRows(5);
+        jScrollPane4.setViewportView(txtReturn);
 
         jMenu1.setText("File");
 
@@ -93,23 +101,25 @@ public class ShareIDE extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(25, 25, 25)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addComponent(btnDebug, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnCompila, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(37, 37, 37))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnDebug, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                    .addComponent(btnCompila, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6))
         );
 
         pack();
@@ -123,7 +133,7 @@ public class ShareIDE extends javax.swing.JFrame {
         //JOptionPane.showMessageDialog(null, buffer);
     }//GEN-LAST:event_txtCodeCaretUpdate
 
-    private void btnDebugMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDebugMouseClicked
+    private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCompilaMouseClicked
         String buffer=new String();
         String temp = "";
         try(  PrintWriter out = new PrintWriter( "filename.java" )  )
@@ -146,10 +156,11 @@ public class ShareIDE extends javax.swing.JFrame {
             InputStream stderr = child.getErrorStream(); // Ottengo lo stream dell'errore
             BufferedReader br = new BufferedReader(new InputStreamReader(stderr));
             buffer= new String();
-            System.out.println("<ERROR>");
             while ( (buffer = br.readLine()) != null)
+            {
                 System.out.println(buffer);
-            System.out.println("</ERROR>");
+                txtReturn.append(buffer+System.lineSeparator());
+            }
             int exitVal = child.waitFor(); // Se exitVal=0 tutto ok se è diverso da 0 c'è qualche errore
             System.out.println("Process exitValue: " + exitVal);
             JOptionPane.showMessageDialog(null, temp);
@@ -158,12 +169,12 @@ public class ShareIDE extends javax.swing.JFrame {
         } catch (InterruptedException ex) {
             Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btnDebugMouseClicked
-
+    }//GEN-LAST:event_btnCompilaMouseClicked
+    
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
 
-        client=new Clientside();
-        JOptionPane.showMessageDialog(null, "Apertura");
+        //client=new Clientside();
+        //JOptionPane.showMessageDialog(null, "Apertura");
 
     }//GEN-LAST:event_formWindowOpened
 
@@ -211,7 +222,7 @@ public class ShareIDE extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDebug;
+    private javax.swing.JButton btnCompila;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -220,6 +231,8 @@ public class ShareIDE extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea txtCode;
+    private javax.swing.JTextArea txtReturn;
     // End of variables declaration//GEN-END:variables
 }
