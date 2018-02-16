@@ -1,6 +1,9 @@
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ShareIDE extends javax.swing.JFrame {
 
@@ -180,7 +185,27 @@ public class ShareIDE extends javax.swing.JFrame {
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.showSaveDialog(null);
+        fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        fileChooser.setFileFilter(new FileNameExtensionFilter("File java","java"));
+        int resul =fileChooser.showSaveDialog(null);
+        if (resul==fileChooser.APPROVE_OPTION)
+        {
+            File fileToSave = fileChooser.getSelectedFile();
+            if (!fileToSave.getName().endsWith(".java")) 
+            {
+                fileToSave = new File(fileToSave.toString() + ".java"); 
+            }
+            BufferedWriter out; 
+            try {
+                out = new BufferedWriter(new FileWriter(fileToSave));
+                out.write(txtCode.getText());
+                out.close();
+            } catch (IOException ex) {
+                Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
+            }            
+        }
+        
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
