@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -202,7 +203,7 @@ public class ShareIDE extends javax.swing.JFrame {
                 out.write(txtCode.getText());
                 out.close();
             } catch (IOException ex) {
-                Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }            
         }
         
@@ -210,7 +211,26 @@ public class ShareIDE extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.showOpenDialog(null);
+        fileChooser.setDialogTitle("Seleziona il file da aprire");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileFilter(new FileNameExtensionFilter("File java","java"));
+        int resul =fileChooser.showOpenDialog(null);
+        if (resul==fileChooser.APPROVE_OPTION)
+        {
+            File fileToOpen = fileChooser.getSelectedFile();
+            try
+            {
+                BufferedReader reader = new BufferedReader(new FileReader(fileToOpen));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    txtCode.append(line+System.lineSeparator());
+                }
+            }
+            catch(IOException e)
+            {
+                JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     public static void main(String args[]) {
