@@ -79,7 +79,11 @@
                   <Component id="jScrollPane1" pref="352" max="32767" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="btnCompila" min="-2" pref="96" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="btnCompila" pref="96" max="32767" attributes="0"/>
+                  <Component id="bntStart" max="32767" attributes="0"/>
+                  <Component id="btnJoin" max="32767" attributes="0"/>
+              </Group>
               <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -89,12 +93,21 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" pref="205" max="32767" attributes="0"/>
-                  <Component id="btnCompila" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jScrollPane1" pref="205" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jScrollPane4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="btnCompila" min="-2" pref="40" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                      <Component id="bntStart" min="-2" pref="44" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnJoin" min="-2" pref="44" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane4" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -143,5 +156,15 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JButton" name="bntStart">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Inizia"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnJoin">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Join"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
