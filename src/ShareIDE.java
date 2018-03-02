@@ -22,9 +22,11 @@ public class ShareIDE extends javax.swing.JFrame {
 
     public ShareIDE() {
         initComponents();
-        Thread listenG=new Thread(new ListenGlobal());
-        listenG.start();
+        Thread.currentThread().setName("Main");
         txtCode.getDocument().addDocumentListener(new MyDocumentListener());
+        Thread listenG=new Thread(new ListenGlobal(txtCode));
+        listenG.start();
+        
     }
 
     @SuppressWarnings("unchecked")
