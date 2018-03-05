@@ -18,7 +18,8 @@ import javax.swing.*;
  * @author diù
  */
 public class ListenGlobal implements Runnable {
-    JTextArea temp;
+    private JTextArea temp;
+    private String msg;
     public ListenGlobal(JTextArea txtCode)
     {
         temp=txtCode;
@@ -27,33 +28,34 @@ public class ListenGlobal implements Runnable {
     public void run() {
         try
         {
-            Thread.currentThread().setName("CIAO");
+            boolean go=true;
+            /*Thread.currentThread().setName("CIAO");
             Thread.sleep(5000);
             //JOptionPane.showMessageDialog(null, Thread.currentThread().getName());
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    Thread.currentThread().setName("CIAO");
-                    temp.append("Blah"+System.lineSeparator());
-                    Thread.currentThread().setName("Main");
-                }
-            });;
-            Thread.sleep(1000);
+            
+            Thread.sleep(1000);*/
             JOptionPane.showMessageDialog(null,"Runnig");
-            String msg= "Ciao";
             InetAddress group = InetAddress.getByName("228.5.6.7");
             MulticastSocket s = new MulticastSocket(6789);
+            s.setLoopbackMode(true);
             s.joinGroup(group);
-            DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);
-            s.send(packet);
-            
+            /*DatagramPacket packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);
+            s.send(packet);*/
+            while (go=true){
             byte[] buf = new byte[1000];
             DatagramPacket recv = new DatagramPacket(buf, buf.length);
             s.receive(recv);
             msg=new String(buf);
-            JOptionPane.showMessageDialog(null,"NN1"+msg);
-            s.receive(recv);
-            msg=new String(buf);
-            JOptionPane.showMessageDialog(null,"NN2"+msg);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    Thread.currentThread().setName("CIAO");                    
+                    temp.append(msg);
+                    //JOptionPane.showMessageDialog(null, "added "+msg);
+                    Thread.currentThread().setName("Main");
+                }
+            });
+            }
             s.leaveGroup(group);
         }
         catch (IOException ex) {
