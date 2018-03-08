@@ -9,7 +9,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
 
 public class MyDocumentListener implements DocumentListener {
     private String msg;
@@ -23,7 +22,7 @@ public class MyDocumentListener implements DocumentListener {
         try {
             group = InetAddress.getByName("228.5.6.7");
             s = new MulticastSocket(6789);
-            s.setLoopbackMode(true);
+            //s.setLoopbackMode(true);
             s.joinGroup(group);
             //packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);
         }
@@ -40,12 +39,14 @@ public class MyDocumentListener implements DocumentListener {
 
     @Override
     public void insertUpdate(DocumentEvent e) {
+        JOptionPane.showMessageDialog(null, "add "+Thread.currentThread().getName());
         if (!Thread.currentThread().getName().equals("CIAO"))
         {
-            int num=e.getLength();
             try {
-                msg = temp.getText();            
-                packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);            
+                msg = temp.getText();
+                packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789); 
+                msg=new String(packet.getData());
+                //JOptionPane.showMessageDialog(null, msg);
                 s.send(packet);
             } catch (IOException ex) {
                 Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);

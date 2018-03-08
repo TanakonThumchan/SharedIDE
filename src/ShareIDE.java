@@ -24,8 +24,10 @@ public class ShareIDE extends javax.swing.JFrame {
         initComponents();
         Thread.currentThread().setName("Main");
         txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
-        Thread listenG=new Thread(new ListenGlobal(txtCode));
-        listenG.start();
+        /*Thread listenG=new Thread(new ListenGlobal(txtCode));
+        listenG.start();*/
+        Listening test = new Listening(txtCode);
+        test.execute();
         
     }
 
