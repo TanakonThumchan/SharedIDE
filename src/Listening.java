@@ -9,13 +9,18 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
+import javax.swing.text.DefaultCaret;
 
 
 public class Listening extends SwingWorker<Void, String>{
     private JTextArea temp;
     private String msg;
+    private int pos;
+    private DefaultCaret caret;
     public Listening(JTextArea txtCode){
         temp=txtCode;
+        caret = (DefaultCaret)txtCode.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
     }
     
     @Override
@@ -25,6 +30,7 @@ public class Listening extends SwingWorker<Void, String>{
             boolean go=true;
             InetAddress group = InetAddress.getByName("228.5.6.7");
             MulticastSocket s = new MulticastSocket(6789);
+            s.setLoopbackMode(true);
             s.joinGroup(group);        
             while(go==true){
                 byte[] buf = new byte[256];
@@ -44,8 +50,15 @@ public class Listening extends SwingWorker<Void, String>{
     @Override
     protected void process(List<String> messages) {
         for (String message : messages) {
+            String tempo=new String();
             Thread.currentThread().setName("CIAO");
-            temp.append(message);
+            tempo=message.replaceAll("\0","");
+            //JOptionPane.showMessageDialog(null, tempo);
+            //pos = temp.getCaretPosition();
+            temp.setText(tempo);
+            //temp.setCaretPosition(pos);
+            
+             
             Thread.currentThread().setName("Main");
         }
     }
