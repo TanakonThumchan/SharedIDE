@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 
@@ -56,7 +57,7 @@ public class MyDocumentListener implements DocumentListener {
                 Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
             }
         }*/
-         sendText();
+         sendText(e);
         //JOptionPane.showMessageDialog(null, "add "+Thread.currentThread().getName());
         //JOptionPane.showMessageDialog(null, "scrivi");
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -65,16 +66,31 @@ public class MyDocumentListener implements DocumentListener {
     @Override
     public void removeUpdate(DocumentEvent e) {
         printInfo(e);
-        sendText();
+        sendText(e);
         //JOptionPane.showMessageDialog(null, "remo "+Thread.currentThread().getName());
         //JOptionPane.showMessageDialog(null, "togli");
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    public void sendText(){
+    public void sendText(DocumentEvent e){
+        int offset;
+        int lenght;
         if (!Thread.currentThread().getName().equals("CIAO"))
         {
+            offset=e.getOffset();
+            lenght=e.getLength();
+            if (e.getType().equals(DocumentEvent.EventType.INSERT))
+            {
+                try {
+                    msg="0"+offset+lenght+temp.getText(offset,lenght);
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else if (e.getType().equals(DocumentEvent.EventType.REMOVE))
+            {
+                msg="1"+offset+lenght;
+            }
             try {
-                msg = temp.getText();
                 packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789); 
                 msg=new String(packet.getData());
                 //JOptionPane.showMessageDialog(null, msg);
@@ -84,6 +100,7 @@ public class MyDocumentListener implements DocumentListener {
             }
         }
     }
+    
     public void printInfo(DocumentEvent documentEvent) {
     System.out.println("Offset: " + documentEvent.getOffset());
     System.out.println("Length: " + documentEvent.getLength());

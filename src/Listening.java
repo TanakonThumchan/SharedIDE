@@ -30,7 +30,7 @@ public class Listening extends SwingWorker<Void, String>{
             boolean go=true;
             InetAddress group = InetAddress.getByName("228.5.6.7");
             MulticastSocket s = new MulticastSocket(6789);
-            s.setLoopbackMode(true);
+            //s.setLoopbackMode(true);
             s.joinGroup(group);        
             while(go==true){
                 byte[] buf = new byte[256];
@@ -51,11 +51,19 @@ public class Listening extends SwingWorker<Void, String>{
     protected void process(List<String> messages) {
         for (String message : messages) {
             String tempo=new String();
-            Thread.currentThread().setName("CIAO");
+            int offset;
+            int lenght;
             tempo=message.replaceAll("\0","");
+            offset=Character.getNumericValue(tempo.charAt(1));
+            lenght=Character.getNumericValue(tempo.charAt(2));
+            Thread.currentThread().setName("CIAO");            
+            if (tempo.charAt(0)=='0')
+            {
+                temp.insert(tempo.substring(3),offset);
+            }
             //JOptionPane.showMessageDialog(null, tempo);
             //pos = temp.getCaretPosition();
-            temp.setText(tempo);
+            //temp.setText(tempo);
             //temp.setCaretPosition(pos);
             
              
