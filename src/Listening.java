@@ -54,12 +54,16 @@ public class Listening extends SwingWorker<Void, String>{
             int offset;
             int lenght;
             tempo=message.replaceAll("\0","");
-            offset=Character.getNumericValue(tempo.charAt(1));
-            lenght=Character.getNumericValue(tempo.charAt(2));
+            offset=Integer.parseInt(tempo.substring(1,4));
+            lenght=Integer.parseInt(tempo.substring(4,7));
             Thread.currentThread().setName("CIAO");            
-            if (tempo.charAt(0)=='0')
+            if (tempo.startsWith("0"))
             {
-                temp.insert(tempo.substring(3),offset);
+                temp.insert(tempo.substring(7),offset);
+            }
+            else if (tempo.startsWith("1"))
+            {
+                temp.replaceRange("", offset, offset+lenght);
             }
             //JOptionPane.showMessageDialog(null, tempo);
             //pos = temp.getCaretPosition();

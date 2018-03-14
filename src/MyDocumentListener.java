@@ -80,15 +80,18 @@ public class MyDocumentListener implements DocumentListener {
             lenght=e.getLength();
             if (e.getType().equals(DocumentEvent.EventType.INSERT))
             {
+                msg="0000000";
+                msg="0"+msg.substring(1,4-String.valueOf(offset).length())+offset+msg.substring(4,7-String.valueOf(lenght).length())+lenght;
                 try {
-                    msg="0"+offset+lenght+temp.getText(offset,lenght);
+                    msg+=temp.getText(offset,lenght);
                 } catch (BadLocationException ex) {
                     Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             else if (e.getType().equals(DocumentEvent.EventType.REMOVE))
             {
-                msg="1"+offset+lenght;
+                msg="1000000";
+                msg="1"+msg.substring(1,4-String.valueOf(offset).length())+offset+msg.substring(4,7-String.valueOf(lenght).length())+lenght;
             }
             try {
                 packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789); 
