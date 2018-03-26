@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,7 +14,7 @@ import javax.swing.SwingWorker;
 import javax.swing.text.DefaultCaret;
 
 
-public class Listening extends SwingWorker<Void, String>{
+public class Listening extends SwingWorker<Void, ByteBuffer>{
     private JTextArea temp;
     private String msg;
     private int pos;
@@ -37,7 +39,8 @@ public class Listening extends SwingWorker<Void, String>{
                 DatagramPacket recv = new DatagramPacket(buf, buf.length);
                 s.receive(recv);
                 msg=new String(recv.getData());
-                publish(msg);
+                ByteBuffer bytebu= ByteBuffer.wrap(buf);
+                publish(bytebu);
             }
             s.leaveGroup(group);
         }      
@@ -48,20 +51,24 @@ public class Listening extends SwingWorker<Void, String>{
         return null;
     }
     @Override
-    protected void process(List<String> messages) {
-        for (String message : messages) {
+    protected void process(List<ByteBuffer> messages) {
+        for (ByteBuffer message : messages) {
             String tempo=new String();
-            int offset;
-            int lenght;
-            tempo=message.replaceAll("\0","");
+            byte[] buffer=new byte[256];
+            int offset=message.getInt(1);
+            short lenght=message.getShort(5);
+            
+            /*tempo=message.replaceAll("\0","");
             offset=Integer.parseInt(tempo.substring(1,4));
-            lenght=Integer.parseInt(tempo.substring(4,7));
+            lenght=Integer.parseInt(tempo.substring(4,7));*/
+            message.get(buffer, 6, lenght);
+            tempo=new String(buffer,Charset.forName("UTF-16BE"));
             Thread.currentThread().setName("CIAO");            
-            if (tempo.startsWith("0"))
+            if (message.getShort(0)==0)
             {
-                temp.insert(tempo.substring(7),offset);
+                temp.insert(tempo,offset);
             }
-            else if (tempo.startsWith("1"))
+            else if (message.getShort(0)==1)
             {
                 temp.replaceRange("", offset, offset+lenght);
             }

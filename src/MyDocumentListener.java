@@ -3,6 +3,10 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -73,17 +77,21 @@ public class MyDocumentListener implements DocumentListener {
     }
     public void sendText(DocumentEvent e){
         int offset;
-        int lenght;
+        int lenght;        
         if (!Thread.currentThread().getName().equals("CIAO"))
         {
             offset=e.getOffset();
             lenght=e.getLength();
+            ByteBuffer buffer= ByteBuffer.allocate((lenght*2)+6);
             if (e.getType().equals(DocumentEvent.EventType.INSERT))
             {
-                msg="0000000";
-                msg="0"+msg.substring(1,4-String.valueOf(offset).length())+offset+msg.substring(4,7-String.valueOf(lenght).length())+lenght;
+                buffer.put(0,(byte)0);
+                buffer.putInt(1,offset);
+                buffer.put(5,(byte)lenght);
                 try {
-                    msg+=temp.getText(offset,lenght);
+                    msg=temp.getText(offset,lenght);
+                    buffer.position(6);
+                    buffer.put(msg.getBytes(Charset.forName("UTF-16BE")));
                 } catch (BadLocationException ex) {
                     Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -94,8 +102,10 @@ public class MyDocumentListener implements DocumentListener {
                 msg="1"+msg.substring(1,4-String.valueOf(offset).length())+offset+msg.substring(4,7-String.valueOf(lenght).length())+lenght;
             }
             try {
-                packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789); 
-                msg=new String(packet.getData());
+                packet = new DatagramPacket(buffer.array(), buffer.capacity(),group, 6789); 
+                msg=new String(buffer.array());
+                System.out.println(Arrays.toString(buffer.array()));
+                System.out.println(buffer.getChar(6));
                 //JOptionPane.showMessageDialog(null, msg);
                 s.send(packet);
             } catch (IOException ex) {
