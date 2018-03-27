@@ -5,7 +5,6 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,7 +86,7 @@ public class MyDocumentListener implements DocumentListener {
             {
                 buffer.put(0,(byte)0);
                 buffer.putInt(1,offset);
-                buffer.put(5,(byte)lenght);
+                buffer.put(5,(byte)(lenght*2));
                 try {
                     msg=temp.getText(offset,lenght);
                     buffer.position(6);

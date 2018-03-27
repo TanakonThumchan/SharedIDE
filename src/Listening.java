@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,12 +57,12 @@ public class Listening extends SwingWorker<Void, ByteBuffer>{
             String tempo=new String();
             byte[] buffer=new byte[256];
             int offset=message.getInt(1);
-            short lenght=message.getShort(5);
+            byte lenght=message.get(5);
             
             /*tempo=message.replaceAll("\0","");
             offset=Integer.parseInt(tempo.substring(1,4));
             lenght=Integer.parseInt(tempo.substring(4,7));*/
-            message.get(buffer, 6, lenght);
+            buffer= Arrays.copyOfRange(message.array(), 6, 6+lenght);
             tempo=new String(buffer,Charset.forName("UTF-16BE"));
             Thread.currentThread().setName("CIAO");            
             if (message.getShort(0)==0)
