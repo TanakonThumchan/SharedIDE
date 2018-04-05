@@ -28,6 +28,8 @@ public class ShareIDE extends javax.swing.JFrame {
         listenG.start();*/
         Listening test = new Listening(txtCode);
         test.execute();
+        TextLineNumber tln = new TextLineNumber(txtCode);
+        linenumber.setRowHeaderView( tln );
         
     }
 
@@ -35,13 +37,13 @@ public class ShareIDE extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtCode = new javax.swing.JTextArea();
         btnCompila = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtReturn = new javax.swing.JTextArea();
         bntStart = new javax.swing.JButton();
         btnJoin = new javax.swing.JButton();
+        linenumber = new javax.swing.JScrollPane();
+        txtCode = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -58,16 +60,6 @@ public class ShareIDE extends javax.swing.JFrame {
             }
         });
 
-        txtCode.setColumns(20);
-        txtCode.setRows(5);
-        txtCode.setTabSize(4);
-        txtCode.addCaretListener(new javax.swing.event.CaretListener() {
-            public void caretUpdate(javax.swing.event.CaretEvent evt) {
-                txtCodeCaretUpdate(evt);
-            }
-        });
-        jScrollPane1.setViewportView(txtCode);
-
         btnCompila.setText("Compila");
         btnCompila.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -83,6 +75,11 @@ public class ShareIDE extends javax.swing.JFrame {
         bntStart.setText("Inizia");
 
         btnJoin.setText("Join");
+
+        txtCode.setColumns(20);
+        txtCode.setRows(5);
+        txtCode.setTabSize(4);
+        linenumber.setViewportView(txtCode);
 
         jMenu1.setText("File");
 
@@ -122,8 +119,8 @@ public class ShareIDE extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
+                    .addComponent(linenumber))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnCompila, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
@@ -137,8 +134,8 @@ public class ShareIDE extends javax.swing.JFrame {
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(linenumber)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(6, 6, 6))
                     .addGroup(layout.createSequentialGroup()
@@ -147,20 +144,13 @@ public class ShareIDE extends javax.swing.JFrame {
                         .addComponent(bntStart, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap(180, Short.MAX_VALUE))))
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
     
-    //evento textbox per la scrittura 
-    private void txtCodeCaretUpdate(javax.swing.event.CaretEvent evt) {//GEN-FIRST:event_txtCodeCaretUpdate
-        String buffer;
-        buffer=txtCode.getText();
-        //JOptionPane.showMessageDialog(null, buffer);
-    }//GEN-LAST:event_txtCodeCaretUpdate
-
     private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCompilaMouseClicked
         String buffer=new String();
         String temp = "";
@@ -299,8 +289,8 @@ public class ShareIDE extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane linenumber;
     private javax.swing.JTextArea txtCode;
     private javax.swing.JTextArea txtReturn;
     // End of variables declaration//GEN-END:variables
