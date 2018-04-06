@@ -65,11 +65,11 @@ public class Listening extends SwingWorker<Void, ByteBuffer>{
             buffer= Arrays.copyOfRange(message.array(), 6, 6+(lenght*2));
             tempo=new String(buffer,Charset.forName("UTF-16BE"));
             Thread.currentThread().setName("CIAO");            
-            if (message.getShort(0)==0)
+            if (message.get(0)==0)
             {
                 temp.insert(tempo,offset);
             }
-            else if (message.getShort(0)==1)
+            else if (message.get(0)==1)
             {
                 temp.replaceRange("", offset, offset+lenght);
             }

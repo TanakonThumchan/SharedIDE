@@ -84,9 +84,9 @@ public class MyDocumentListener implements DocumentListener {
             ByteBuffer buffer;
             if (lenght<=125)
             {                
-                buffer= ByteBuffer.allocate((lenght*2)+6);
                 if (e.getType().equals(DocumentEvent.EventType.INSERT))
                 {
+                    buffer= ByteBuffer.allocate((lenght*2)+6);
                     buffer.put(0,(byte)0);
                     buffer.putInt(1,offset);
                     buffer.put(5,(byte)lenght);
@@ -97,66 +97,92 @@ public class MyDocumentListener implements DocumentListener {
                     } catch (BadLocationException ex) {
                         Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    sendBuffer(buffer);
                 }
                 else if (e.getType().equals(DocumentEvent.EventType.REMOVE))
                 {
-                    msg="1000000";
-                    msg="1"+msg.substring(1,4-String.valueOf(offset).length())+offset+msg.substring(4,7-String.valueOf(lenght).length())+lenght;
-                }
-                sendBuffer(buffer);
-            }
-            else 
-            {
-                int n=0;
-                while (n<lenght)
-                {
-                    buffer= ByteBuffer.allocate(256);
-                    buffer.put(0,(byte)0);
+                    buffer= ByteBuffer.allocate(6);
+                    buffer.put(0,(byte)1);
                     buffer.putInt(1,offset);
-                    buffer.put(5,(byte)125);
-                    try {
-                        msg=temp.getText(offset,125);
-                        buffer.position(6);
-                        buffer.put(msg.getBytes(Charset.forName("UTF-16BE")));
-                    } catch (BadLocationException ex) {
-                        Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    buffer.put(5,(byte)lenght);
                     sendBuffer(buffer);
-                    n=n+125;
-                    offset=offset+125;
                 }
-                lenght=lenght-(n-125);
-                buffer= ByteBuffer.allocate((lenght*2)+6);
-                buffer.put(0,(byte)0);
-                buffer.putInt(1, offset);
-                buffer.put(5, (byte) lenght);
-                try {
-                    msg = temp.getText(offset, lenght);
-                    buffer.position(6);
-                    buffer.put(msg.getBytes(Charset.forName("UTF-16BE")));
-                } catch (BadLocationException ex) {
-                    Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                sendBuffer(buffer);
                 
             }
-            
-            
+            else 
+            {                
+                int n=0;
+                while ((n+125)<lenght)
+                {
+                    if (e.getType().equals(DocumentEvent.EventType.INSERT))
+                    {
+                        buffer= ByteBuffer.allocate(256);
+                        buffer.put(0,(byte)0);
+                        buffer.putInt(1,offset);
+                        buffer.put(5,(byte)125);
+                        try {
+                            msg=temp.getText(offset,125);
+                            buffer.position(6);
+                            buffer.put(msg.getBytes(Charset.forName("UTF-16BE")));
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        sendBuffer(buffer);
+                        offset=offset+125;
+                    }
+                    else if (e.getType().equals(DocumentEvent.EventType.REMOVE))
+                    {
+                        buffer= ByteBuffer.allocate(6);
+                        buffer.put(0,(byte)1);
+                        buffer.putInt(1,offset);
+                        buffer.put(5,(byte)125);
+                        sendBuffer(buffer);
+                    }                    
+                    n=n+125;                    
+                }
+                lenght=lenght-n;
+                if (lenght>0)
+                {
+                    if (e.getType().equals(DocumentEvent.EventType.INSERT))
+                    {
+                        buffer= ByteBuffer.allocate((lenght*2)+6);
+                        buffer.put(0,(byte)0);
+                        buffer.putInt(1, offset);
+                        buffer.put(5, (byte) lenght);
+                        try {
+                            msg = temp.getText(offset, lenght);
+                            buffer.position(6);
+                            buffer.put(msg.getBytes(Charset.forName("UTF-16BE")));
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        sendBuffer(buffer);
+                    }
+                    else if (e.getType().equals(DocumentEvent.EventType.REMOVE))
+                    {
+                        buffer= ByteBuffer.allocate(6);
+                        buffer.put(0,(byte)1);
+                        buffer.putInt(1,offset);
+                        buffer.put(5,(byte)lenght);
+                        sendBuffer(buffer);
+                    }                    
+                }                
+            }
         }
     }
-    
+
     public void sendBuffer(ByteBuffer buffer)
     {
         try {
-                packet = new DatagramPacket(buffer.array(), buffer.capacity(),group, 6789); 
-                msg=new String(buffer.array());
-                System.out.println(Arrays.toString(buffer.array()));
-                System.out.println(buffer.getChar(6));
-                //JOptionPane.showMessageDialog(null, msg);
-                s.send(packet);
-            } catch (IOException ex) {
-                Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            packet = new DatagramPacket(buffer.array(), buffer.capacity(),group, 6789); 
+            msg=new String(buffer.array());
+            System.out.println(Arrays.toString(buffer.array()));
+            //System.out.println(buffer.getChar(6));
+            //JOptionPane.showMessageDialog(null, msg);
+            s.send(packet);
+        } catch (IOException ex) {
+            Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void printInfo(DocumentEvent documentEvent) {
