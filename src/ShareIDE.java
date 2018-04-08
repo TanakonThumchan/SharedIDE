@@ -12,23 +12,33 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class ShareIDE extends javax.swing.JFrame {
 
-    Clientside client;
-
+    private Clientside client;
+    private Listening test;
+    private TextLineNumber tln;
+    private JPopupMenu popup;
+    private JMenuItem copia; private JMenuItem incolla; private JMenuItem commenta;
     public ShareIDE() {
         initComponents();
         Thread.currentThread().setName("Main");
         txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
+        popup = new JPopupMenu("Popup Menu");
+        copia = new JMenuItem("Copia");
+        incolla = new JMenuItem("Incolla");
+        commenta = new JMenuItem("Commenta");
+        popup.add(copia); popup.add(incolla); popup.add(commenta);
+        txtCode.setComponentPopupMenu(popup);
         /*Thread listenG=new Thread(new ListenGlobal(txtCode));
         listenG.start();*/
-        Listening test = new Listening(txtCode);
+        test = new Listening(txtCode);
         test.execute();
-        TextLineNumber tln = new TextLineNumber(txtCode);
+        tln = new TextLineNumber(txtCode);
         linenumber.setRowHeaderView( tln );
         
     }
@@ -54,6 +64,7 @@ public class ShareIDE extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jMenuItem8 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Share IDE");
@@ -121,6 +132,9 @@ public class ShareIDE extends javax.swing.JFrame {
         jMenuItem7.setText("Commenta");
         jMenu2.add(jMenuItem7);
 
+        jMenuItem8.setText("JavaDoc");
+        jMenu2.add(jMenuItem8);
+
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -132,7 +146,7 @@ public class ShareIDE extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
                     .addComponent(linenumber))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -157,7 +171,7 @@ public class ShareIDE extends javax.swing.JFrame {
                         .addComponent(bntStart, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(180, Short.MAX_VALUE))))
+                        .addContainerGap(266, Short.MAX_VALUE))))
         );
 
         pack();
@@ -305,6 +319,7 @@ public class ShareIDE extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane linenumber;
     private javax.swing.JTextArea txtCode;
