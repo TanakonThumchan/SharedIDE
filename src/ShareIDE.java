@@ -28,10 +28,25 @@ public class ShareIDE extends javax.swing.JFrame {
         initComponents();
         Thread.currentThread().setName("Main");
         txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
-        popup = new JPopupMenu("Popup Menu");
+        popup = new JPopupMenu("Popup Menu");        
         copia = new JMenuItem("Copia");
+        copia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copia();
+            }
+        });
         incolla = new JMenuItem("Incolla");
+        incolla.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                incolla();
+            }
+        });
         commenta = new JMenuItem("Commenta");
+        commenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                //commentaActionPerformed(evt);
+            }
+        });
         popup.add(copia); popup.add(incolla); popup.add(commenta);
         txtCode.setComponentPopupMenu(popup);
         /*Thread listenG=new Thread(new ListenGlobal(txtCode));
@@ -68,11 +83,6 @@ public class ShareIDE extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Share IDE");
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
-            }
-        });
 
         btnCompila.setText("Compila");
         btnCompila.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -216,13 +226,6 @@ public class ShareIDE extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnCompilaMouseClicked
     
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-
-        //client=new Clientside();
-        //JOptionPane.showMessageDialog(null, "Apertura");
-
-    }//GEN-LAST:event_formWindowOpened
-
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
@@ -271,7 +274,22 @@ public class ShareIDE extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
-
+    
+    public void copia()
+    {
+        txtCode.copy();
+    }
+    
+    public void incolla()
+    {
+        txtCode.paste();
+    }
+    
+    public void taglia()
+    {
+        txtCode.cut();
+    }
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
