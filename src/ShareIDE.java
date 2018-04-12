@@ -44,7 +44,7 @@ public class ShareIDE extends javax.swing.JFrame {
         commenta = new JMenuItem("Commenta");
         commenta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                //commentaActionPerformed(evt);
+                commenta();
             }
         });
         popup.add(copia); popup.add(incolla); popup.add(commenta);
@@ -72,14 +72,14 @@ public class ShareIDE extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        menuApri = new javax.swing.JMenuItem();
+        menuSalva = new javax.swing.JMenuItem();
+        menuSalvaNome = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
-        jMenuItem7 = new javax.swing.JMenuItem();
-        jMenuItem8 = new javax.swing.JMenuItem();
+        menuCerca = new javax.swing.JMenuItem();
+        menuSostituisci = new javax.swing.JMenuItem();
+        menuCommenta = new javax.swing.JMenuItem();
+        menuJavaDoc = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Share IDE");
@@ -110,40 +110,55 @@ public class ShareIDE extends javax.swing.JFrame {
         jMenuItem4.setText("Nuovo");
         jMenu1.add(jMenuItem4);
 
-        jMenuItem1.setText("Apri");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        menuApri.setText("Apri");
+        menuApri.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                menuApriActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+        jMenu1.add(menuApri);
 
-        jMenuItem2.setText("Salva");
-        jMenu1.add(jMenuItem2);
+        menuSalva.setText("Salva");
+        jMenu1.add(menuSalva);
 
-        jMenuItem3.setText("Salva con nome");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        menuSalvaNome.setText("Salva con nome");
+        menuSalvaNome.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                menuSalvaNomeActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem3);
+        jMenu1.add(menuSalvaNome);
 
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Edit");
 
-        jMenuItem5.setText("Cerca");
-        jMenu2.add(jMenuItem5);
+        menuCerca.setText("Cerca");
+        menuCerca.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuCercaActionPerformed(evt);
+            }
+        });
+        jMenu2.add(menuCerca);
 
-        jMenuItem6.setText("Sostituisci");
-        jMenu2.add(jMenuItem6);
+        menuSostituisci.setText("Sostituisci");
+        menuSostituisci.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSostituisciActionPerformed(evt);
+            }
+        });
+        jMenu2.add(menuSostituisci);
 
-        jMenuItem7.setText("Commenta");
-        jMenu2.add(jMenuItem7);
+        menuCommenta.setText("Commenta");
+        menuCommenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuCommentaActionPerformed(evt);
+            }
+        });
+        jMenu2.add(menuCommenta);
 
-        jMenuItem8.setText("JavaDoc");
-        jMenu2.add(jMenuItem8);
+        menuJavaDoc.setText("JavaDoc");
+        jMenu2.add(menuJavaDoc);
 
         jMenuBar1.add(jMenu2);
 
@@ -187,8 +202,22 @@ public class ShareIDE extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void menuCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCercaActionPerformed
+        SearchDialog s = new SearchDialog(this,true,txtCode);
+        s.setVisible(true);
+    }//GEN-LAST:event_menuCercaActionPerformed
+
+    private void menuCommentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCommentaActionPerformed
+        commenta();
+    }//GEN-LAST:event_menuCommentaActionPerformed
+
+    private void menuSostituisciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSostituisciActionPerformed
+        ReplaceDialog r= new ReplaceDialog(this,true,txtCode);
+        r.setVisible(true);
+    }//GEN-LAST:event_menuSostituisciActionPerformed
     
-    private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCompilaMouseClicked
+    private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {                                        
         String buffer=new String();
         String temp = "";
         try(  PrintWriter out = new PrintWriter( "filename.java" )  )
@@ -224,9 +253,9 @@ public class ShareIDE extends javax.swing.JFrame {
         } catch (InterruptedException ex) {
             Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btnCompilaMouseClicked
+    }
     
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    private void menuSalvaNomeActionPerformed(java.awt.event.ActionEvent evt) {                                              
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -249,9 +278,9 @@ public class ShareIDE extends javax.swing.JFrame {
             }            
         }
         
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    }
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void menuApriActionPerformed(java.awt.event.ActionEvent evt) {                                         
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleziona il file da aprire");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -273,7 +302,7 @@ public class ShareIDE extends javax.swing.JFrame {
                 JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }                                          
     
     public void copia()
     {
@@ -288,6 +317,14 @@ public class ShareIDE extends javax.swing.JFrame {
     public void taglia()
     {
         txtCode.cut();
+    }
+    
+    public void commenta()
+    {
+        int start=txtCode.getSelectionStart();
+        int end=txtCode.getSelectionEnd();
+        txtCode.insert("/*", start);
+        txtCode.insert("*/", end+2);
     }
     
     public static void main(String args[]) {
@@ -330,16 +367,16 @@ public class ShareIDE extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JMenuItem jMenuItem7;
-    private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane linenumber;
+    private javax.swing.JMenuItem menuApri;
+    private javax.swing.JMenuItem menuCerca;
+    private javax.swing.JMenuItem menuCommenta;
+    private javax.swing.JMenuItem menuJavaDoc;
+    private javax.swing.JMenuItem menuSalva;
+    private javax.swing.JMenuItem menuSalvaNome;
+    private javax.swing.JMenuItem menuSostituisci;
     private javax.swing.JTextArea txtCode;
     private javax.swing.JTextArea txtReturn;
     // End of variables declaration//GEN-END:variables
