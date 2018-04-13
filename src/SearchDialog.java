@@ -26,11 +26,13 @@ public class SearchDialog extends javax.swing.JDialog {
      */
     JTextArea txtCode;
     Highlighter highlighter;
+    int index;
     public SearchDialog(java.awt.Frame parent, boolean modal, JTextArea txtCode) {
         super(parent, modal);
         initComponents();
         this.txtCode = txtCode;
         highlighter = txtCode.getHighlighter();
+        index=0;
     }
     
     
@@ -47,6 +49,7 @@ public class SearchDialog extends javax.swing.JDialog {
         btnCerca = new javax.swing.JButton();
         btnAnnulla = new javax.swing.JButton();
         txtCerca = new javax.swing.JTextField();
+        btnTrova = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -69,6 +72,13 @@ public class SearchDialog extends javax.swing.JDialog {
             }
         });
 
+        btnTrova.setText("Trova successivo");
+        btnTrova.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnTrovaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -77,8 +87,10 @@ public class SearchDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 176, Short.MAX_VALUE)
+                        .addGap(0, 55, Short.MAX_VALUE)
                         .addComponent(btnCerca)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnTrova)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAnnulla))
                     .addComponent(txtCerca))
@@ -92,7 +104,8 @@ public class SearchDialog extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCerca)
-                    .addComponent(btnAnnulla))
+                    .addComponent(btnAnnulla)
+                    .addComponent(btnTrova))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -102,17 +115,17 @@ public class SearchDialog extends javax.swing.JDialog {
 
     private void btnCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCercaActionPerformed
         String search = txtCerca.getText();
-        if (search!="")
+        highlighter.removeAllHighlights();
+        index=0;
+        if (!search.equals(""))
         {                    
-            DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN);
-
-            highlighter.removeAllHighlights();     
+            DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.CYAN);                 
             Pattern pattern = Pattern.compile( Pattern.quote(search) );
             Matcher matcher = pattern.matcher(txtCode.getText());                    
 
             while(matcher.find()) {
                 try {
-                    highlighter.addHighlight(matcher.start(), matcher.end(), painter);
+                    highlighter.addHighlight(matcher.start(), matcher.end(), painter);                    
                 } catch (BadLocationException ex) {
                     Logger.getLogger(SearchDialog.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -130,9 +143,42 @@ public class SearchDialog extends javax.swing.JDialog {
         highlighter.removeAllHighlights();
     }//GEN-LAST:event_formWindowClosing
 
+    private void btnTrovaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTrovaActionPerformed
+        String search = txtCerca.getText();
+        highlighter.removeAllHighlights();        
+        if (!search.equals(""))
+        {                    
+            DefaultHighlighter.DefaultHighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.yellow);                 
+            Pattern pattern = Pattern.compile( Pattern.quote(search) );
+            Matcher matcher = pattern.matcher(txtCode.getText());                    
+            if (matcher.find(index)){
+                try {
+                    highlighter.addHighlight(matcher.start(), matcher.end(), painter);
+                    index=matcher.end();
+                    txtCode.setCaretPosition(matcher.start());
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(SearchDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else 
+            {
+                index=0;
+                matcher.find(index);
+                try {
+                    highlighter.addHighlight(matcher.start(), matcher.end(), painter);
+                    index=matcher.end();
+                    txtCode.setCaretPosition(matcher.start());
+                } catch (BadLocationException ex) {
+                    Logger.getLogger(SearchDialog.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_btnTrovaActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnnulla;
     private javax.swing.JButton btnCerca;
+    private javax.swing.JButton btnTrova;
     private javax.swing.JTextField txtCerca;
     // End of variables declaration//GEN-END:variables
 }

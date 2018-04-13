@@ -30,8 +30,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="0" pref="176" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="55" max="32767" attributes="0"/>
                       <Component id="btnCerca" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnTrova" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnAnnulla" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -50,6 +52,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnCerca" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnAnnulla" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnTrova" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -74,6 +77,14 @@
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="txtCerca">
+    </Component>
+    <Component class="javax.swing.JButton" name="btnTrova">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Trova successivo"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnTrovaActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
