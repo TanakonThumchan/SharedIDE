@@ -97,8 +97,18 @@ public class ShareIDE extends javax.swing.JFrame {
         jScrollPane4.setViewportView(txtReturn);
 
         bntStart.setText("Inizia");
+        bntStart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bntStartActionPerformed(evt);
+            }
+        });
 
         btnJoin.setText("Join");
+        btnJoin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnJoinActionPerformed(evt);
+            }
+        });
 
         txtCode.setColumns(20);
         txtCode.setRows(5);
@@ -216,6 +226,15 @@ public class ShareIDE extends javax.swing.JFrame {
         ReplaceDialog r= new ReplaceDialog(this,true,txtCode);
         r.setVisible(true);
     }//GEN-LAST:event_menuSostituisciActionPerformed
+
+    private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
+        JoinDialog j= new JoinDialog(this,true);
+        j.setVisible(true);
+    }//GEN-LAST:event_btnJoinActionPerformed
+
+    private void bntStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntStartActionPerformed
+        
+    }//GEN-LAST:event_bntStartActionPerformed
     
     private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {                                        
         String buffer=new String();
