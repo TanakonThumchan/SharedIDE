@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,12 +24,16 @@ public class ShareIDE extends javax.swing.JFrame {
     private Listening test;
     private TextLineNumber tln;
     private JPopupMenu popup;
-    private JMenuItem copia; private JMenuItem incolla; private JMenuItem commenta;
+    boolean click;
+    private JMenuItem copia;
+    private JMenuItem incolla;
+    private JMenuItem commenta;
+
     public ShareIDE() {
         initComponents();
         Thread.currentThread().setName("Main");
         txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
-        popup = new JPopupMenu("Popup Menu");        
+        popup = new JPopupMenu("Popup Menu");
         copia = new JMenuItem("Copia");
         copia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -47,15 +52,17 @@ public class ShareIDE extends javax.swing.JFrame {
                 commenta();
             }
         });
-        popup.add(copia); popup.add(incolla); popup.add(commenta);
+        popup.add(copia);
+        popup.add(incolla);
+        popup.add(commenta);
         txtCode.setComponentPopupMenu(popup);
         /*Thread listenG=new Thread(new ListenGlobal(txtCode));
         listenG.start();*/
         test = new Listening(txtCode);
         test.execute();
         tln = new TextLineNumber(txtCode);
-        linenumber.setRowHeaderView( tln );
-        
+        linenumber.setRowHeaderView(tln);
+
     }
 
     @SuppressWarnings("unchecked")
@@ -65,7 +72,7 @@ public class ShareIDE extends javax.swing.JFrame {
         btnCompila = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         txtReturn = new javax.swing.JTextArea();
-        bntStart = new javax.swing.JButton();
+        btnStart = new javax.swing.JButton();
         btnJoin = new javax.swing.JButton();
         linenumber = new javax.swing.JScrollPane();
         txtCode = new javax.swing.JTextArea();
@@ -96,10 +103,10 @@ public class ShareIDE extends javax.swing.JFrame {
         txtReturn.setRows(5);
         jScrollPane4.setViewportView(txtReturn);
 
-        bntStart.setText("Inizia");
-        bntStart.addActionListener(new java.awt.event.ActionListener() {
+        btnStart.setText("Inizia");
+        btnStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bntStartActionPerformed(evt);
+                btnStartActionPerformed(evt);
             }
         });
 
@@ -186,7 +193,7 @@ public class ShareIDE extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnCompila, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
-                    .addComponent(bntStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnJoin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(37, 37, 37))
         );
@@ -203,7 +210,7 @@ public class ShareIDE extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCompila, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(4, 4, 4)
-                        .addComponent(bntStart, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(266, Short.MAX_VALUE))))
@@ -214,7 +221,7 @@ public class ShareIDE extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void menuCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCercaActionPerformed
-        SearchDialog s = new SearchDialog(this,true,txtCode);
+        SearchDialog s = new SearchDialog(this, true, txtCode);
         s.setVisible(true);
     }//GEN-LAST:event_menuCercaActionPerformed
 
@@ -223,31 +230,36 @@ public class ShareIDE extends javax.swing.JFrame {
     }//GEN-LAST:event_menuCommentaActionPerformed
 
     private void menuSostituisciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSostituisciActionPerformed
-        ReplaceDialog r= new ReplaceDialog(this,true,txtCode);
+        ReplaceDialog r = new ReplaceDialog(this, true, txtCode);
         r.setVisible(true);
     }//GEN-LAST:event_menuSostituisciActionPerformed
 
     private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
-        JoinDialog j= new JoinDialog(this,true);
+        JoinDialog j = new JoinDialog(this, true);
         j.setVisible(true);
     }//GEN-LAST:event_btnJoinActionPerformed
 
-    private void bntStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntStartActionPerformed
-        
-    }//GEN-LAST:event_bntStartActionPerformed
-    
-    private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {                                        
-        String buffer=new String();
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
+        if (click == false) {
+            click = true;
+            btnStart.setBackground(Color.GREEN);
+        } else {
+            click = false;
+            btnStart.setBackground(null);
+        }
+    }//GEN-LAST:event_btnStartActionPerformed
+
+    private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {
+        String buffer = new String();
         String temp = "";
-        try(  PrintWriter out = new PrintWriter( "filename.java" )  )
-            {
-                buffer=txtCode.getText();
-                out.println( buffer );
-            } catch (FileNotFoundException ex) {
+        try (PrintWriter out = new PrintWriter("filename.java")) {
+            buffer = txtCode.getText();
+            out.println(buffer);
+        } catch (FileNotFoundException ex) {
             Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        }
         try {
-            buffer= new String();
+            buffer = new String();
             String command = "cmd /c javac Filename.java";
             Process child = Runtime.getRuntime().exec(command);
 //            OutputStream out = child.getOutputStream();
@@ -258,11 +270,10 @@ public class ShareIDE extends javax.swing.JFrame {
             }
             InputStream stderr = child.getErrorStream(); // Ottengo lo stream dell'errore
             BufferedReader br = new BufferedReader(new InputStreamReader(stderr));
-            buffer= new String();
-            while ( (buffer = br.readLine()) != null)
-            {
+            buffer = new String();
+            while ((buffer = br.readLine()) != null) {
                 System.out.println(buffer);
-                txtReturn.append(buffer+System.lineSeparator());
+                txtReturn.append(buffer + System.lineSeparator());
             }
             int exitVal = child.waitFor(); // Se exitVal=0 tutto ok se è diverso da 0 c'è qualche errore
             System.out.println("Process exitValue: " + exitVal);
@@ -273,79 +284,69 @@ public class ShareIDE extends javax.swing.JFrame {
             Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    private void menuSalvaNomeActionPerformed(java.awt.event.ActionEvent evt) {                                              
+
+    private void menuSalvaNomeActionPerformed(java.awt.event.ActionEvent evt) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-        fileChooser.setFileFilter(new FileNameExtensionFilter("File java","java"));
-        int resul =fileChooser.showSaveDialog(null);
-        if (resul==fileChooser.APPROVE_OPTION)
-        {
+        fileChooser.setFileFilter(new FileNameExtensionFilter("File java", "java"));
+        int resul = fileChooser.showSaveDialog(null);
+        if (resul == fileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
-            if (!fileToSave.getName().endsWith(".java")) 
-            {
-                fileToSave = new File(fileToSave.toString() + ".java"); 
+            if (!fileToSave.getName().endsWith(".java")) {
+                fileToSave = new File(fileToSave.toString() + ".java");
             }
-            BufferedWriter out; 
+            BufferedWriter out;
             try {
                 out = new BufferedWriter(new FileWriter(fileToSave));
                 out.write(txtCode.getText());
                 out.close();
             } catch (IOException ex) {
                 JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            }            
+            }
         }
-        
+
     }
 
-    private void menuApriActionPerformed(java.awt.event.ActionEvent evt) {                                         
+    private void menuApriActionPerformed(java.awt.event.ActionEvent evt) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleziona il file da aprire");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setFileFilter(new FileNameExtensionFilter("File java","java"));
-        int resul =fileChooser.showOpenDialog(null);
-        if (resul==fileChooser.APPROVE_OPTION)
-        {
+        fileChooser.setFileFilter(new FileNameExtensionFilter("File java", "java"));
+        int resul = fileChooser.showOpenDialog(null);
+        if (resul == fileChooser.APPROVE_OPTION) {
             File fileToOpen = fileChooser.getSelectedFile();
-            try
-            {
+            try {
                 BufferedReader reader = new BufferedReader(new FileReader(fileToOpen));
                 String line = null;
                 while ((line = reader.readLine()) != null) {
-                    txtCode.append(line+System.lineSeparator());
+                    txtCode.append(line + System.lineSeparator());
                 }
-            }
-            catch(IOException e)
-            {
+            } catch (IOException e) {
                 JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
         }
-    }                                          
-    
-    public void copia()
-    {
+    }
+
+    public void copia() {
         txtCode.copy();
     }
-    
-    public void incolla()
-    {
+
+    public void incolla() {
         txtCode.paste();
     }
-    
-    public void taglia()
-    {
+
+    public void taglia() {
         txtCode.cut();
     }
-    
-    public void commenta()
-    {
-        int start=txtCode.getSelectionStart();
-        int end=txtCode.getSelectionEnd();
+
+    public void commenta() {
+        int start = txtCode.getSelectionStart();
+        int end = txtCode.getSelectionEnd();
         txtCode.insert("/*", start);
-        txtCode.insert("*/", end+2);
+        txtCode.insert("*/", end + 2);
     }
-    
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -367,8 +368,8 @@ public class ShareIDE extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }     
-   
+        }
+
         //</editor-fold>
 
         /* Create and display the form */
@@ -380,9 +381,9 @@ public class ShareIDE extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bntStart;
     private javax.swing.JButton btnCompila;
     private javax.swing.JButton btnJoin;
+    private javax.swing.JButton btnStart;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;

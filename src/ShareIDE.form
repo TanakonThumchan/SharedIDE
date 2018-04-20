@@ -109,7 +109,7 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="btnCompila" pref="96" max="32767" attributes="0"/>
-                  <Component id="bntStart" max="32767" attributes="0"/>
+                  <Component id="btnStart" max="32767" attributes="0"/>
                   <Component id="btnJoin" max="32767" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
@@ -130,7 +130,7 @@
                   <Group type="102" attributes="0">
                       <Component id="btnCompila" min="-2" pref="40" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                      <Component id="bntStart" min="-2" pref="44" max="-2" attributes="0"/>
+                      <Component id="btnStart" min="-2" pref="44" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnJoin" min="-2" pref="44" max="-2" attributes="0"/>
                       <EmptySpace pref="266" max="32767" attributes="0"/>
@@ -165,12 +165,12 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JButton" name="bntStart">
+    <Component class="javax.swing.JButton" name="btnStart">
       <Properties>
         <Property name="text" type="java.lang.String" value="Inizia"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bntStartActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnStartActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnJoin">

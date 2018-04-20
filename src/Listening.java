@@ -17,7 +17,6 @@ import javax.swing.text.DefaultCaret;
 
 public class Listening extends SwingWorker<Void, ByteBuffer>{
     private JTextArea temp;
-    private String msg;
     private int pos;
     private DefaultCaret caret;
     public Listening(JTextArea txtCode){
@@ -30,20 +29,17 @@ public class Listening extends SwingWorker<Void, ByteBuffer>{
     protected Void doInBackground() throws Exception {
         try
         {
-            boolean go=true;
             InetAddress group = InetAddress.getByName("228.5.6.7");
             MulticastSocket s = new MulticastSocket(6789);
             //s.setLoopbackMode(true);
             s.joinGroup(group);        
-            while(go==true){
+            while(true){
                 byte[] buf = new byte[256];
                 DatagramPacket recv = new DatagramPacket(buf, buf.length);
                 s.receive(recv);
-                msg=new String(recv.getData());
                 ByteBuffer bytebu= ByteBuffer.wrap(buf);
                 publish(bytebu);
             }
-            s.leaveGroup(group);
         }      
         catch (IOException ex) {
             JOptionPane.showMessageDialog(null,"Errr");

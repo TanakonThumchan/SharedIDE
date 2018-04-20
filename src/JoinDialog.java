@@ -3,9 +3,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /*
@@ -24,10 +27,13 @@ public class JoinDialog extends javax.swing.JDialog {
     private InetAddress group;
     private MulticastSocket s;
     private DatagramPacket packet;
+    private ListenJoin thread;
     public JoinDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         timer = new Timer();
+        thread=new ListenJoin(lstCanali);
+        thread.execute();
         try {
             group = InetAddress.getByName("228.5.6.7");
             s = new MulticastSocket(6789);
@@ -131,8 +137,48 @@ public class JoinDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowOpened
     
     public void aggiorna(){
-        ByteBuffer buffer = ByteBuffer.allocate(10);
-        
+        ByteBuffer buffer = ByteBuffer.allocate(31);
+        String address="";
+        try {
+            InetAddress localHost = InetAddress.getLocalHost();
+            address=normalizzaIp(localHost.getHostAddress());            
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(address);
+        buffer.put(0,(byte)3);
+        for (int i=1;i<31;i++)
+        {
+            buffer.putChar(i,address.charAt(i-1));
+        }
+        packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, 6789);
+        try {
+            s.send(packet);
+        } catch (IOException ex) {
+            Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static String normalizzaIp(String bruttoIp)
+    {
+        String res= "";
+        String [] arrOfStr = new String[4];
+        arrOfStr = bruttoIp.split("\\.");
+        for(int j=0;j<4;j++){
+            switch (arrOfStr[j].length()) {
+                case 1:  res += "00"+arrOfStr[j];
+                         break;
+                case 2:  res += "0"+arrOfStr[j];
+                         break;
+                case 3:  res +=arrOfStr[j];
+                         break;
+                default: res = "Invalid ip";
+                         break;
+            }
+            res+=".";
+        }
+        String newstr = res.substring(0,15 );
+        return newstr;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
