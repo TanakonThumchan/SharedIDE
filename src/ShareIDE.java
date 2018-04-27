@@ -24,7 +24,7 @@ public class ShareIDE extends javax.swing.JFrame {
     private Listening test;
     private TextLineNumber tln;
     private JPopupMenu popup;
-    boolean click;
+    private boolean click;
     private JMenuItem copia;
     private JMenuItem incolla;
     private JMenuItem commenta;
@@ -76,6 +76,7 @@ public class ShareIDE extends javax.swing.JFrame {
         btnJoin = new javax.swing.JButton();
         linenumber = new javax.swing.JScrollPane();
         txtCode = new javax.swing.JTextArea();
+        lblNome = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -121,6 +122,8 @@ public class ShareIDE extends javax.swing.JFrame {
         txtCode.setRows(5);
         txtCode.setTabSize(4);
         linenumber.setViewportView(txtCode);
+
+        lblNome.setToolTipText("");
 
         jMenu1.setText("File");
 
@@ -194,7 +197,8 @@ public class ShareIDE extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnCompila, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
                     .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnJoin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnJoin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblNome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(37, 37, 37))
         );
         layout.setVerticalGroup(
@@ -202,18 +206,19 @@ public class ShareIDE extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(linenumber, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(linenumber)
+                        .addComponent(lblNome, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(btnCompila, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(4, 4, 4)
                         .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(266, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6))
         );
 
         pack();
@@ -243,6 +248,10 @@ public class ShareIDE extends javax.swing.JFrame {
         if (click == false) {
             click = true;
             btnStart.setBackground(Color.GREEN);
+            String nome = (String)JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null,null);
+            lblNome.setText(nome);
+            Thread lisPub=new Thread(new ListenPublic(nome));
+            lisPub.start();
         } else {
             click = false;
             btnStart.setBackground(null);
@@ -389,6 +398,7 @@ public class ShareIDE extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JLabel lblNome;
     private javax.swing.JScrollPane linenumber;
     private javax.swing.JMenuItem menuApri;
     private javax.swing.JMenuItem menuCerca;

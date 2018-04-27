@@ -10,6 +10,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -28,12 +29,14 @@ public class JoinDialog extends javax.swing.JDialog {
     private MulticastSocket s;
     private DatagramPacket packet;
     private ListenJoin thread;
+    DefaultTableModel model;
     public JoinDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         timer = new Timer();
-        thread=new ListenJoin(lstCanali);
+        thread=new ListenJoin(tblCanali);
         thread.execute();
+        model = (DefaultTableModel) tblCanali.getModel();
         try {
             group = InetAddress.getByName("228.5.6.7");
             s = new MulticastSocket(6789);
@@ -55,25 +58,23 @@ public class JoinDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        lstCanali = new javax.swing.JList<>();
         btnEntra = new javax.swing.JButton();
         btnAnnulla = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblCanali = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtNome = new javax.swing.JTextPane();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
         });
-
-        lstCanali.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        lstCanali.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane1.setViewportView(lstCanali);
 
         btnEntra.setText("Entra");
         btnEntra.addActionListener(new java.awt.event.ActionListener() {
@@ -89,30 +90,64 @@ public class JoinDialog extends javax.swing.JDialog {
             }
         });
 
+        tblCanali.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Nome", "Indirizzo"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(tblCanali);
+
+        jScrollPane1.setViewportView(txtNome);
+
+        jLabel1.setText("Nickname: ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(179, Short.MAX_VALUE)
                         .addComponent(btnEntra)
                         .addGap(18, 18, 18)
-                        .addComponent(btnAnnulla))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 313, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnAnnulla)))
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAnnulla)
                     .addComponent(btnEntra))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -120,11 +155,19 @@ public class JoinDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAnnullaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnnullaActionPerformed
+        thread.cancel(true);
         this.dispose();
     }//GEN-LAST:event_btnAnnullaActionPerformed
 
     private void btnEntraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntraActionPerformed
-        // TODO add your handling code here:
+        String nome=txtNome.getText();
+        if (!nome.equals("")){
+            
+        }
+        else 
+        {
+            JOptionPane.showConfirmDialog(null, "Inserisci prima il nickname", "Nome assente", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnEntraActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
@@ -135,10 +178,15 @@ public class JoinDialog extends javax.swing.JDialog {
             }
         }, 0, 10000);        
     }//GEN-LAST:event_formWindowOpened
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        thread.cancel(true);
+    }//GEN-LAST:event_formWindowClosed
     
     public void aggiorna(){
         ByteBuffer buffer = ByteBuffer.allocate(31);
         String address="";
+        model.setRowCount(0);
         try {
             InetAddress localHost = InetAddress.getLocalHost();
             address=normalizzaIp(localHost.getHostAddress());            
@@ -146,10 +194,11 @@ public class JoinDialog extends javax.swing.JDialog {
             Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println(address);
-        buffer.put(0,(byte)3);
-        for (int i=1;i<31;i++)
+        buffer.put(0,(byte)2);
+        buffer.position(1);
+        for (int i=0;i<15;i++)
         {
-            buffer.putChar(i,address.charAt(i-1));
+            buffer.putChar(address.charAt(i));
         }
         packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, 6789);
         try {
@@ -162,7 +211,7 @@ public class JoinDialog extends javax.swing.JDialog {
     public static String normalizzaIp(String bruttoIp)
     {
         String res= "";
-        String [] arrOfStr = new String[4];
+        String [] arrOfStr;
         arrOfStr = bruttoIp.split("\\.");
         for(int j=0;j<4;j++){
             switch (arrOfStr[j].length()) {
@@ -184,7 +233,10 @@ public class JoinDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnnulla;
     private javax.swing.JButton btnEntra;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList<String> lstCanali;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable tblCanali;
+    private javax.swing.JTextPane txtNome;
     // End of variables declaration//GEN-END:variables
 }
