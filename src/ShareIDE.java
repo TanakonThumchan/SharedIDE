@@ -251,7 +251,9 @@ public class ShareIDE extends javax.swing.JFrame {
             String nome = (String)JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null,null);
             lblNome.setText(nome);
             Thread lisPub=new Thread(new ListenPublic(nome));
+            Thread lisReguest=new Thread(new ListenRequest(txtCode));
             lisPub.start();
+            lisReguest.start();
         } else {
             click = false;
             btnStart.setBackground(null);

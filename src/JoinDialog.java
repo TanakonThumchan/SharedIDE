@@ -1,8 +1,10 @@
 
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Timer;
@@ -30,11 +32,12 @@ public class JoinDialog extends javax.swing.JDialog {
     private DatagramPacket packet;
     private ListenJoin thread;
     DefaultTableModel model;
+
     public JoinDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         timer = new Timer();
-        thread=new ListenJoin(tblCanali);
+        thread = new ListenJoin(tblCanali);
         thread.execute();
         model = (DefaultTableModel) tblCanali.getModel();
         try {
@@ -43,9 +46,8 @@ public class JoinDialog extends javax.swing.JDialog {
             //s.setLoopbackMode(true);
             s.joinGroup(group);
             //packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);
-        }
-        catch (IOException ex) {
-            JOptionPane.showMessageDialog(null,"Errr");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Errr");
         }
     }
 
@@ -160,12 +162,35 @@ public class JoinDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_btnAnnullaActionPerformed
 
     private void btnEntraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntraActionPerformed
-        String nome=txtNome.getText();
-        if (!nome.equals("")){
-            
-        }
-        else 
-        {
+        String nome = txtNome.getText();
+        if (!nome.equals("")) {
+            int column = 1;
+            int row = tblCanali.getSelectedRow();
+            String value = "";
+            String address = "";
+            try {
+                value = tblCanali.getModel().getValueAt(row, column).toString();
+                Socket client = new Socket(value, 9091);
+                DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                ByteBuffer bytebu = ByteBuffer.allocate(256);
+                InetAddress localHost = InetAddress.getLocalHost();
+                address = normalizzaIp(localHost.getHostAddress());
+                bytebu.put(0, (byte) 4);
+                bytebu.position(1);
+                for (int i = 0; i < 15; i++) {
+                    bytebu.putChar(address.charAt(i));
+                }
+                for (int i = 0; i < nome.length(); i++) {
+                    bytebu.putChar(nome.charAt(i));
+                }
+                out.write(bytebu.array());
+                client.close();
+                out.close();
+            } catch (Exception E) {
+                JOptionPane.showConfirmDialog(null, "Seleziona un host", "", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            }
+            System.out.println(value);
+        } else {
             JOptionPane.showConfirmDialog(null, "Inserisci prima il nickname", "Nome assente", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnEntraActionPerformed
@@ -176,28 +201,27 @@ public class JoinDialog extends javax.swing.JDialog {
             public void run() {
                 aggiorna();
             }
-        }, 0, 10000);        
+        }, 0, 10000);
     }//GEN-LAST:event_formWindowOpened
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         thread.cancel(true);
     }//GEN-LAST:event_formWindowClosed
-    
-    public void aggiorna(){
+
+    public void aggiorna() {
         ByteBuffer buffer = ByteBuffer.allocate(31);
-        String address="";
+        String address = "";
         model.setRowCount(0);
         try {
             InetAddress localHost = InetAddress.getLocalHost();
-            address=normalizzaIp(localHost.getHostAddress());            
+            address = normalizzaIp(localHost.getHostAddress());
         } catch (UnknownHostException ex) {
             Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println(address);
-        buffer.put(0,(byte)2);
+        buffer.put(0, (byte) 2);
         buffer.position(1);
-        for (int i=0;i<15;i++)
-        {
+        for (int i = 0; i < 15; i++) {
             buffer.putChar(address.charAt(i));
         }
         packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, 6789);
@@ -207,29 +231,32 @@ public class JoinDialog extends javax.swing.JDialog {
             Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public static String normalizzaIp(String bruttoIp)
-    {
-        String res= "";
-        String [] arrOfStr;
+
+    public static String normalizzaIp(String bruttoIp) {
+        String res = "";
+        String[] arrOfStr;
         arrOfStr = bruttoIp.split("\\.");
-        for(int j=0;j<4;j++){
+        for (int j = 0; j < 4; j++) {
             switch (arrOfStr[j].length()) {
-                case 1:  res += "00"+arrOfStr[j];
-                         break;
-                case 2:  res += "0"+arrOfStr[j];
-                         break;
-                case 3:  res +=arrOfStr[j];
-                         break;
-                default: res = "Invalid ip";
-                         break;
+                case 1:
+                    res += "00" + arrOfStr[j];
+                    break;
+                case 2:
+                    res += "0" + arrOfStr[j];
+                    break;
+                case 3:
+                    res += arrOfStr[j];
+                    break;
+                default:
+                    res = "Invalid ip";
+                    break;
             }
-            res+=".";
+            res += ".";
         }
-        String newstr = res.substring(0,15 );
+        String newstr = res.substring(0, 15);
         return newstr;
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnnulla;
     private javax.swing.JButton btnEntra;
