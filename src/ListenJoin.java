@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
@@ -29,9 +30,11 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
     String msg;
     JTable temp = new JTable();
     DefaultTableModel model;
+    JTextArea code;
 
-    public ListenJoin(JTable tblCanali) {
+    public ListenJoin(JTable tblCanali, JTextArea txtCode) {        
         temp = tblCanali;
+        code = txtCode;
         model = (DefaultTableModel) temp.getModel();
     }
 
@@ -60,14 +63,30 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
             byte[] buffer = new byte[256];
             String ip;
             String name;
+            int offset;
+            byte lenght = 0;
+            String msg;
             try {
                 DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 in.read(buffer);
-                ByteBuffer buf = ByteBuffer.wrap(buffer);                
+                ByteBuffer buf = ByteBuffer.wrap(buffer);
                 if (buf.get(0) == 3) {
                     ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
                     model.addRow(new Object[]{name, ip});
+                } else if (buf.get(0) == 8) {
+                    do {
+                        lenght = buf.get(5);
+                        offset = buf.getInt(1);
+                        if (lenght >0) {
+                            Thread.currentThread().setName("CIAO");
+                            msg = new String(Arrays.copyOfRange(buf.array(), 6, 6 + (lenght * 2)), Charset.forName("UTF-16BE"));
+                            code.insert(msg, offset);
+                            in.read(buffer);
+                            buf = ByteBuffer.wrap(buffer);
+                            Thread.currentThread().setName("Main");
+                        }
+                    } while (buf.get(0) == 8 && lenght == 125);
                 }
                 socket.close();
             } catch (IOException ex) {

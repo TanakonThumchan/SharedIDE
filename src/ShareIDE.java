@@ -240,7 +240,7 @@ public class ShareIDE extends javax.swing.JFrame {
     }//GEN-LAST:event_menuSostituisciActionPerformed
 
     private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
-        JoinDialog j = new JoinDialog(this, true);
+        JoinDialog j = new JoinDialog(this, true,txtCode);
         j.setVisible(true);
     }//GEN-LAST:event_btnJoinActionPerformed
 

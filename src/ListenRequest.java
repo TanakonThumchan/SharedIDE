@@ -12,30 +12,35 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author thumchan.13108
  */
-public class ListenRequest implements Runnable{
+public class ListenRequest implements Runnable {
+
     JTextArea temp;
-    public ListenRequest(JTextArea txtCode){
-        temp=txtCode;
+
+    public ListenRequest(JTextArea txtCode) {
+        temp = txtCode;
     }
+
     @Override
     public void run() {
         byte[] buffer;
         Socket socket;
-        DataInputStream in;String ip="";String name="";
+        DataInputStream in;
+        String ip = "";
+        String name = "";
         try {
             ServerSocket listener = new ServerSocket(9091);
-            while (true){
+            while (true) {
                 buffer = new byte[256];
                 socket = listener.accept();
                 in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -45,30 +50,69 @@ public class ListenRequest implements Runnable{
                     ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
                 }
-                int resul=JOptionPane.showConfirmDialog(null, name, "Richiesta", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if (resul==JOptionPane.YES_OPTION){
+                int resul = JOptionPane.showConfirmDialog(null, name, "Richiesta", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                Socket client = new Socket(ip, 9090);
+                DataOutputStream out = new DataOutputStream(client.getOutputStream());
+                if (resul == JOptionPane.YES_OPTION) {
                     System.out.println("si");
-                    String text=temp.getText();
-                    int lenght=text.length();
-                    int offset=0;int n = 0;
-                    try{
-                        Socket client = new Socket(ip, 9090);
-                        DataOutputStream out = new DataOutputStream(client.getOutputStream());
-                        buf = ByteBuffer.allocate(256);
-                        while((n + 125) < lenght){
-                            //xcvxcv
+                    String text = temp.getText();
+                    int lenght = text.length();
+                    int offset = 0;
+                    try {
+                        if (lenght <= 125) {
+                            buf = ByteBuffer.allocate((lenght * 2) + 6);
+                            buf.put(0, (byte) 8);
+                            buf.putInt(1, 0);
+                            buf.put(5, (byte) lenght);
+                            buf.position(6);
+                            buf.put(text.getBytes(Charset.forName("UTF-16BE")));
+                            out.write(buf.array());
+
+                            out.close();
+                            client.close();
+                        } else {
+                            while ((offset + 125) < lenght) {
+                                buf = ByteBuffer.allocate(256);
+                                buf.put(0, (byte) 8);
+                                buf.putInt(1, 0);
+                                buf.put(5, (byte) 125);
+                                buf.put((text.substring(offset, offset + 125)).getBytes(Charset.forName("UTF-16BE")));
+                                out.write(buf.array());
+                                offset = offset + 125;
+                            }
+                            lenght = lenght - offset;
+                            if (lenght > 0) {
+                                buf = ByteBuffer.allocate((lenght * 2) + 6);
+                                buf.put(0, (byte) 8);
+                                buf.putInt(1, 0);
+                                buf.put(5, (byte) lenght);
+                                buf.position(6);
+                                buf.put((text.substring(offset, offset + lenght)).getBytes(Charset.forName("UTF-16BE")));;
+                                out.write(buf.array());
+
+                                out.close();
+                                client.close();
+                            }
                         }
-                        
+
+                    } catch (Exception e) {
+
                     }
-                    catch(Exception e){
-                        
-                    }
+                } else if (resul == JOptionPane.NO_OPTION) {
+                    buf = ByteBuffer.allocate(6);
+                    buf.put(0, (byte) 8);
+                    buf.putInt(1, 0);
+                    buf.put(5, (byte) 0);
+                    out.write(buf.array());
+
+                    out.close();
+                    client.close();
                 }
             }
         } catch (IOException ex) {
             Logger.getLogger(ListenRequest.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
-    
+
 }

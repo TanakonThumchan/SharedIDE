@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
 /*
@@ -33,11 +34,11 @@ public class JoinDialog extends javax.swing.JDialog {
     private ListenJoin thread;
     DefaultTableModel model;
 
-    public JoinDialog(java.awt.Frame parent, boolean modal) {
+    public JoinDialog(java.awt.Frame parent, boolean modal,JTextArea txtCode) {
         super(parent, modal);
         initComponents();
         timer = new Timer();
-        thread = new ListenJoin(tblCanali);
+        thread = new ListenJoin(tblCanali,txtCode);
         thread.execute();
         model = (DefaultTableModel) tblCanali.getModel();
         try {
