@@ -7,23 +7,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.*;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- *
- * @author diù
+ * Thread in ascolto per ricevere i messaggi dagli altri client e aggiunge il testo ricevuto alla casella di testo
+ * @deprecated 
  */
 public class ListenGlobal implements Runnable {
     private JTextArea temp;
     private String msg;
+    /**
+     * @deprecated 
+     * @param txtCode Casella di testo
+     */
     public ListenGlobal(JTextArea txtCode)
     {
         temp=txtCode;
     }
+    
+    /**
+     * @deprecated 
+     */
     @Override
     public void run() {
         try
@@ -69,6 +72,9 @@ public class ListenGlobal implements Runnable {
         }
     }
     
+    /**
+     * @deprecated 
+     */
     protected void update()
     {
         SwingWorker worker;

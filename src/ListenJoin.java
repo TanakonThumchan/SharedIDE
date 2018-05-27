@@ -16,14 +16,9 @@ import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
- *
- * @author thumchan.13108
+ * Thread in ascolto per ricevere risposte dagli altri client <br>
+ * In base al tipo di messaggio ricevuto può eseguire delle operazioni
  */
 public class ListenJoin extends SwingWorker<Void, Socket> {
 
@@ -32,12 +27,22 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
     DefaultTableModel model;
     JTextArea code;
 
-    public ListenJoin(JTable tblCanali, JTextArea txtCode) {        
+    /**
+     * Inizializza alcuni componenti grafici
+     *
+     * @param tblCanali Tabella contenente la lista delle collaborazione
+     * disponibile
+     * @param txtCode Casella di testo per scrivere il codice
+     */
+    public ListenJoin(JTable tblCanali, JTextArea txtCode) {
         temp = tblCanali;
         code = txtCode;
         model = (DefaultTableModel) temp.getModel();
     }
 
+    /**
+     * Resta in ascolto per ricevere il collegamentto socket dagli altri client
+     */
     @Override
     protected Void doInBackground() throws Exception {
         try {
@@ -57,6 +62,13 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
         return null;
     }
 
+    /**
+     * Riceve il collegamento socket e in base in base al tipo di messaggio
+     * ricevuto può aggionare la lista delle collaborazione disponibile o
+     * ricevere il testo iniziale dagli altri client quando si è appena
+     * collegato alla collaborazione
+     * @param socks Collegameto socket
+     */
     @Override
     protected void process(List<Socket> socks) {
         for (Socket socket : socks) {
@@ -78,7 +90,7 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                     do {
                         lenght = buf.get(5);
                         offset = buf.getInt(1);
-                        if (lenght >0) {
+                        if (lenght > 0) {
                             Thread.currentThread().setName("CIAO");
                             msg = new String(Arrays.copyOfRange(buf.array(), 6, 6 + (lenght * 2)), Charset.forName("UTF-16BE"));
                             code.insert(msg, offset);

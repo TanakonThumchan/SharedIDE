@@ -16,6 +16,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 
+/**
+ * Listener notifica quando avviene una modifica al codice e invia le modifiche agli altri host
+ */
 public class MyDocumentListener implements DocumentListener {
 
     private String msg;
@@ -25,6 +28,10 @@ public class MyDocumentListener implements DocumentListener {
     private JTextArea temp;
     private Element elem;
 
+    /**
+     * Inizializza la connessione
+     * @param txtCode Casella di testo
+     */
     public MyDocumentListener(JTextArea txtCode) {
         temp = txtCode;
         try {
@@ -45,6 +52,10 @@ public class MyDocumentListener implements DocumentListener {
         //JOptionPane.showMessageDialog(null, "cambio");
     }
 
+    /**
+     * Funzione richiamata quando avviene un inserimento del testo
+     * @param e Evento di modifica
+     */
     @Override
     public void insertUpdate(DocumentEvent e) {
         printInfo(e);
@@ -67,6 +78,10 @@ public class MyDocumentListener implements DocumentListener {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Funzione richiamata quando avviene una rimozione del testo 
+     * @param e Evento di modifica 
+     */
     @Override
     public void removeUpdate(DocumentEvent e) {
         printInfo(e);
@@ -76,6 +91,10 @@ public class MyDocumentListener implements DocumentListener {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * In base all'operazione di modifica costruisce il messaggio seguendo il protocollo stabilito
+     * @param e Evento di modifica
+     */
     public void createBuffer(DocumentEvent e) {
         int offset = 0;
         int lenght = 0;
@@ -158,6 +177,10 @@ public class MyDocumentListener implements DocumentListener {
         }
     }
 
+    /**
+     * Invia il messaggio in multicast
+     * @param buffer Messaggio da inviare
+     */
     public void sendBuffer(ByteBuffer buffer) {
         try {
             packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, 6789);
@@ -171,6 +194,10 @@ public class MyDocumentListener implements DocumentListener {
         }
     }
 
+    /**
+     * Stampa il tipo di modifica effettuata
+     * @param documentEvent Evento di modifica
+     */
     public void printInfo(DocumentEvent documentEvent) {
         System.out.println("Offset: " + documentEvent.getOffset());
         System.out.println("Length: " + documentEvent.getLength());

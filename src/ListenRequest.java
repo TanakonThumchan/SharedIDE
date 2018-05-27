@@ -12,25 +12,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.text.BadLocationException;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
- *
- * @author thumchan.13108
+ * Thread in ascolto per ricevere le richieste di partecipazione dagli altri client<br>
+ * L'utente può decidere se accettare la richiesta o meno.
  */
 public class ListenRequest implements Runnable {
 
     JTextArea temp;
 
+    /**
+     * @param txtCode Casella di testo
+     */
     public ListenRequest(JTextArea txtCode) {
         temp = txtCode;
     }
 
+    /**
+     * Riceve la richiesta di partecipazione e chiede all'utente se accettare la richiesta<br>
+     * L'utente accetta la richista: invia il contenuto della casella di testo al client.<br>
+     * L'utente rifiuta la richiesta: invia il messaggio di rifiuto.
+     */
     @Override
     public void run() {
         byte[] buffer;

@@ -14,17 +14,27 @@ import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
 import javax.swing.text.DefaultCaret;
 
-
+/**
+ * Thread in ascolto per ricevere le modifiche dagli altri client e aggiorna la casella di testo
+ * @see SwingWorker
+ */
 public class Listening extends SwingWorker<Void, ByteBuffer>{
     private JTextArea temp;
     private int pos;
     private DefaultCaret caret;
+    
+    /**
+     * @param txtCode Casela di testo
+     */
     public Listening(JTextArea txtCode){
         temp=txtCode;
         caret = (DefaultCaret)txtCode.getCaret();
         caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
     }
     
+    /**
+     * Stabilisce la connessione e riceve i pacchetti
+     */
     @Override
     protected Void doInBackground() throws Exception {
         try
@@ -43,10 +53,15 @@ public class Listening extends SwingWorker<Void, ByteBuffer>{
         }      
         catch (IOException ex) {
             JOptionPane.showMessageDialog(null,"Errr");
-            Logger.getLogger(ListenGlobal.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Listening.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }
+    
+    /**
+     * In base al tipo di messaggio ricevuto la funzione può aggiungere o togliere testo dal TextArea
+     * @param messages Messaggio ricevuto
+     */
     @Override
     protected void process(List<ByteBuffer> messages) {
         for (ByteBuffer message : messages) {
@@ -74,7 +89,6 @@ public class Listening extends SwingWorker<Void, ByteBuffer>{
             //temp.setText(tempo);
             //temp.setCaretPosition(pos);
             
-             
             Thread.currentThread().setName("Main");
         }
     }

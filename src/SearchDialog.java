@@ -9,24 +9,22 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
- * @author thumchan.13108
+ * Finestra di dialogo per cercare testo
+ * @see Highlighter
  */
 public class SearchDialog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form SearchDialog
-     */
     JTextArea txtCode;
     Highlighter highlighter;
     int index;
+    /**
+     * Inizializza i componenti grafici
+     * @param parent Finestra madre
+     * @param modal Modalità di apertura
+     * @param txtCode Casella di testo
+     * @see Highlighter
+     */
     public SearchDialog(java.awt.Frame parent, boolean modal, JTextArea txtCode) {
         super(parent, modal);
         initComponents();
@@ -113,6 +111,11 @@ public class SearchDialog extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Cerca e evidenzia tutti i testi corrispondente al testo inserito
+     * @param evt evento click dell'opzione Cerca
+     * @see Highlighter
+     */
     private void btnCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCercaActionPerformed
         String search = txtCerca.getText();
         highlighter.removeAllHighlights();
@@ -134,15 +137,31 @@ public class SearchDialog extends javax.swing.JDialog {
         
     }//GEN-LAST:event_btnCercaActionPerformed
 
+    /**
+     * Rimuove tutte le evidenziazione e chiude la finestra 
+     * @param evt evento click dell'opzione Annulla
+     * @see Highlighter
+     */
     private void btnAnnullaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnnullaActionPerformed
         highlighter.removeAllHighlights();
         this.dispose();
     }//GEN-LAST:event_btnAnnullaActionPerformed
 
+    /**
+     * Rimuove tutte le evidenziazione e chiude la finestra 
+     * @param evt evento chiusura finestra
+     * @see Highlighter
+     */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         highlighter.removeAllHighlights();
     }//GEN-LAST:event_formWindowClosing
 
+    /**
+     * Cerca e evidenzia il testo corrispondente al testo inserito<br>
+     * Ogni volta che viene schiacciato il pultante "Trova successivo" evidenzia il prossimo testo corrispondente
+     * @param evt evento click dell'opzione Trova successivo
+     * @see Highlighter
+     */
     private void btnTrovaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTrovaActionPerformed
         String search = txtCerca.getText();
         highlighter.removeAllHighlights();        

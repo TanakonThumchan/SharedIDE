@@ -15,14 +15,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
- *
- * @author diù
+ * Finestra con elenco delle collaborazione disponibile <br>
+ * L'utente sceglie il suo username e può inviare la rischiesta di collaborazione 
  */
 public class JoinDialog extends javax.swing.JDialog {
 
@@ -34,6 +29,15 @@ public class JoinDialog extends javax.swing.JDialog {
     private ListenJoin thread;
     DefaultTableModel model;
 
+    /**
+     * Inizializza i componenti grafici e stabilisce una connessione <br>
+     * Avvia un thread in ascolto per ricevere dei pacchetti 
+     * @param parent Finestra madre
+     * @param modal Modalità di apertura
+     * @param txtCode Casella di testo
+     * @see ListenJoin
+     * @see MulticastSocket
+     */ 
     public JoinDialog(java.awt.Frame parent, boolean modal,JTextArea txtCode) {
         super(parent, modal);
         initComponents();
@@ -157,11 +161,20 @@ public class JoinDialog extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Chiusura della finestra
+     * @param evt evento click dell'opzione Annulla
+     */
     private void btnAnnullaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnnullaActionPerformed
         thread.cancel(true);
         this.dispose();
     }//GEN-LAST:event_btnAnnullaActionPerformed
 
+    /**
+     * Invia la rischista partecipazione alla collaborazione selezionato
+     * @param evt evento click dell'opzione Entra
+     * @see Socket
+     */
     private void btnEntraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntraActionPerformed
         String nome = txtNome.getText();
         if (!nome.equals("")) {
@@ -196,6 +209,11 @@ public class JoinDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnEntraActionPerformed
 
+    /**
+     * Avvia la funzione aggiorna che viene eseguita periodicamente
+     * @param evt evento apertura della finestra
+     * @see Timer
+     */
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         timer.schedule(new TimerTask() {
             @Override
@@ -209,6 +227,9 @@ public class JoinDialog extends javax.swing.JDialog {
         thread.cancel(true);
     }//GEN-LAST:event_formWindowClosed
 
+    /**
+     * Invia un messaggio di ricerca in broadcast per ricevere poi la risposta 
+     */
     public void aggiorna() {
         ByteBuffer buffer = ByteBuffer.allocate(31);
         String address = "";
@@ -233,6 +254,11 @@ public class JoinDialog extends javax.swing.JDialog {
         }
     }
 
+    /**
+     * Trasforma l'indirizzo IP in un formato stabilito
+     * @param bruttoIp L'indirizzo da convertire
+     * @return L'indirizzo convertito
+     */
     public static String normalizzaIp(String bruttoIp) {
         String res = "";
         String[] arrOfStr;

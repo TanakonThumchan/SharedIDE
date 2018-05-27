@@ -11,24 +11,23 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
- * @author thumchan.13108
+ * Finestra di dialogo per cercare e sostituire testo
+ * @see Highlighter
  */
 public class ReplaceDialog extends javax.swing.JDialog {
 
-    /**
-     * Creates new form ReplaceDialog
-     */
     JTextArea txtCode;
     int index; int start;
     Highlighter highlighter;
+    
+    /**
+     * Inizializza i componenti grafici
+     * @param parent Finestra madre
+     * @param modal Modalità di apertura
+     * @param txtCode Casella di testo
+     * @see Highlighter
+     */
     public ReplaceDialog(java.awt.Frame parent, boolean modal, JTextArea txtCode) {
         super(parent, modal);
         initComponents();
@@ -147,6 +146,11 @@ public class ReplaceDialog extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Cerca e evidenzia il testo corrispondente al testo inserito<br>
+     * Ogni volta che viene schiacciato il pultante Cerca evidenzia il prossimo testo corrispondente
+     * @param evt evento click dell'opzione Cerca
+     */
     private void btnCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCercaActionPerformed
         String search = txtCerca.getText();
         highlighter.removeAllHighlights();
@@ -180,6 +184,10 @@ public class ReplaceDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnCercaActionPerformed
 
+    /**
+     * Sostituisce il testo evidenziato con il testo inserito
+     * @param evt evento click dell'opzione Sostituisci
+     */
     private void btnSostituisciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSostituisciActionPerformed
         String sostituisci = txtSostituisci.getText();
         String search = txtCerca.getText();
@@ -206,6 +214,10 @@ public class ReplaceDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnSostituisciActionPerformed
 
+    /**
+     * Sostituisce tutti i testi corrispondente al testo cercato con il testo inserito 
+     * @param evt evento click dell'opzione Sostituisci tutto
+     */
     private void btnSostituisciAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSostituisciAllActionPerformed
         String sostituisci = txtSostituisci.getText();
         String search = txtCerca.getText();
@@ -219,11 +231,19 @@ public class ReplaceDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnSostituisciAllActionPerformed
 
+    /**
+     * Rimuove tutte le evidenziazione e chiude la finestra 
+     * @param evt evento click dell'opzione Annulla
+     */
     private void btnAnnullaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnnullaActionPerformed
         highlighter.removeAllHighlights();
         this.dispose();
     }//GEN-LAST:event_btnAnnullaActionPerformed
 
+    /**
+     * Rimuove tutte le evidenziazione e chiude la finestra 
+     * @param evt evento chiusura finestra 
+     */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         highlighter.removeAllHighlights();
     }//GEN-LAST:event_formWindowClosing

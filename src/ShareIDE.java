@@ -18,6 +18,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/**
+ * Finestra pricipale del programma 
+ */
 public class ShareIDE extends javax.swing.JFrame {
 
     private Clientside client;
@@ -28,10 +31,16 @@ public class ShareIDE extends javax.swing.JFrame {
     private JMenuItem copia;
     private JMenuItem incolla;
     private JMenuItem commenta;
-
+    private boolean salva;
+    private String file;
+    
+    /**
+     * Costruttore: inizializza i componenti principale dell'applicazione
+     */
     public ShareIDE() {
         initComponents();
         Thread.currentThread().setName("Main");
+        salva=false;file="";
         txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
         popup = new JPopupMenu("Popup Menu");
         copia = new JMenuItem("Copia");
@@ -139,6 +148,11 @@ public class ShareIDE extends javax.swing.JFrame {
         jMenu1.add(menuApri);
 
         menuSalva.setText("Salva");
+        menuSalva.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSalvaActionPerformed(evt);
+            }
+        });
         jMenu1.add(menuSalva);
 
         menuSalvaNome.setText("Salva con nome");
@@ -224,26 +238,53 @@ public class ShareIDE extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    /**
+     * Avvia una finestra con le opzioni di ricerca del testo
+     * @param evt evento click dell'opzione Cerca
+     * @see SearchDialog
+     */
     private void menuCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCercaActionPerformed
         SearchDialog s = new SearchDialog(this, true, txtCode);
         s.setVisible(true);
     }//GEN-LAST:event_menuCercaActionPerformed
 
+    /**
+     * Richiama il metodo 'commenta()' che trasforma il testo selezionato in commento Java
+     * @param evt evento click dell'opzione Commenta
+     */
     private void menuCommentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCommentaActionPerformed
         commenta();
     }//GEN-LAST:event_menuCommentaActionPerformed
 
+    /**
+     * Avvia una finestra con le opzioni di ricerca e sostituzione  del testo
+     * @param evt evento click dell'opzione Sostituisci
+     * @see ReplaceDialog
+     */
     private void menuSostituisciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSostituisciActionPerformed
         ReplaceDialog r = new ReplaceDialog(this, true, txtCode);
         r.setVisible(true);
     }//GEN-LAST:event_menuSostituisciActionPerformed
 
+    /**
+     * Avvia una finestra con la lista delle collaborazioni attive
+     * @param evt evento click dell'opzione Join
+     * @see JoinDialog
+     */
     private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
         JoinDialog j = new JoinDialog(this, true,txtCode);
         j.setVisible(true);
     }//GEN-LAST:event_btnJoinActionPerformed
 
+    /**
+     * Crea la collaborazione e resta in ascolto per le richieste di partecipazione degli altri host.
+     * Viene chiesto l'utente di inserire il nome della collaborazione.<br>
+     * Se la collaborazione è gia attiva allora viene disattivata.
+     * @param evt evento click dell'opzione Start
+     * @see ListenPublic
+     * @see ListenRequest
+     */
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         if (click == false) {
             click = true;
@@ -255,11 +296,31 @@ public class ShareIDE extends javax.swing.JFrame {
             lisPub.start();
             lisReguest.start();
         } else {
+            lblNome.setText(null);
             click = false;
             btnStart.setBackground(null);
         }
     }//GEN-LAST:event_btnStartActionPerformed
 
+    /**
+     * Salva il file aperto<br>
+     * Se è la prima volta apre la finestra salva con nome
+     * @param evt 
+     */
+    private void menuSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalvaActionPerformed
+        if (salva!=false){
+            salva();
+        }
+        else 
+        {
+            salvaNome();
+        }
+    }//GEN-LAST:event_menuSalvaActionPerformed
+
+    /**
+     * Salva il file, compila il codice e restituisce il messaggio del compilatore
+     * @param evt evento click dell'opzione Compila
+     */
     private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {
         String buffer = new String();
         String temp = "";
@@ -296,7 +357,86 @@ public class ShareIDE extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Salva il file con il nome scelto dall'utente nella directory scelta
+     * @param evt evento click dell'opzione Salva Con Nome
+     */
     private void menuSalvaNomeActionPerformed(java.awt.event.ActionEvent evt) {
+        salvaNome();
+    }
+
+    /**
+     * Mostra il contenuto del file scelto
+     * @param evt evento click dell'opzione Apri
+     * @see JFileChooser
+     */
+    private void menuApriActionPerformed(java.awt.event.ActionEvent evt) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Seleziona il file da aprire");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileFilter(new FileNameExtensionFilter("File java", "java"));
+        int resul = fileChooser.showOpenDialog(null);
+        if (resul == fileChooser.APPROVE_OPTION) {
+            File fileToOpen = fileChooser.getSelectedFile();
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(fileToOpen));
+                String line = null;
+                txtCode.setText(null);
+                while ((line = reader.readLine()) != null) {
+                    txtCode.append(line + System.lineSeparator());
+                }
+                file=fileToOpen.getAbsolutePath();
+            } catch (IOException e) {
+                JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * Copia il testo selezionato
+     */
+    public void copia() {
+        txtCode.copy();
+    }
+
+    /**
+     * Incolla il testo copiato nella posizione del puntatore
+     */
+    public void incolla() {
+        txtCode.paste();
+    }
+
+    /**
+     * Copia il testo selezionato e lo cancella
+     */
+    public void taglia() {
+        txtCode.cut();
+    }
+
+    /**
+     * Trasforma il testo selezionato in commento Java
+     */
+    public void commenta() {
+        int start = txtCode.getSelectionStart();
+        int end = txtCode.getSelectionEnd();
+        txtCode.insert("/*", start);
+        txtCode.insert("*/", end + 2);
+    }
+    
+    /**
+     * Salva il file
+     */
+    public void salva(){
+        BufferedWriter out;
+        File fileToSave = new File(file);
+        
+    }
+    
+    /**
+     * Salva il file con il nome scelto dall'utente nella directory scelta
+     * @see JFileChooser
+     */
+    public void salvaNome(){
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -312,50 +452,12 @@ public class ShareIDE extends javax.swing.JFrame {
                 out = new BufferedWriter(new FileWriter(fileToSave));
                 out.write(txtCode.getText());
                 out.close();
+                salva=true;
+                file=fileToSave.getAbsolutePath();
             } catch (IOException ex) {
                 JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
         }
-
-    }
-
-    private void menuApriActionPerformed(java.awt.event.ActionEvent evt) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Seleziona il file da aprire");
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setFileFilter(new FileNameExtensionFilter("File java", "java"));
-        int resul = fileChooser.showOpenDialog(null);
-        if (resul == fileChooser.APPROVE_OPTION) {
-            File fileToOpen = fileChooser.getSelectedFile();
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(fileToOpen));
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    txtCode.append(line + System.lineSeparator());
-                }
-            } catch (IOException e) {
-                JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    public void copia() {
-        txtCode.copy();
-    }
-
-    public void incolla() {
-        txtCode.paste();
-    }
-
-    public void taglia() {
-        txtCode.cut();
-    }
-
-    public void commenta() {
-        int start = txtCode.getSelectionStart();
-        int end = txtCode.getSelectionEnd();
-        txtCode.insert("/*", start);
-        txtCode.insert("*/", end + 2);
     }
 
     public static void main(String args[]) {

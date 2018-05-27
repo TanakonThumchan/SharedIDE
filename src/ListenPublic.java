@@ -12,24 +12,25 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
- * @author thumchan.13108
+ * Thread in ascolto per ricevere gli evetuali messaggi di ricerca dagli altri client per poi rispondere 
+ * inviando le informazione riguardante la propria collaborazione
  */
 public class ListenPublic implements Runnable {
 
     String name;
 
+    /**
+     * Inizializza il nome della collaborazione
+     * @param name Nome della collaborazione
+     */
     public ListenPublic(String name) {
         this.name=name;
     }
 
+    /**
+     * Riceve il messaggio di ricerca e risponde
+     */
     @Override
     public void run() {
         try {
@@ -72,10 +73,15 @@ public class ListenPublic implements Runnable {
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Errr");
-            Logger.getLogger(ListenGlobal.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ListenPublic.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
+    /**
+     * Trasforma l'indirizzo IP in un formato stabilito
+     * @param bruttoIp L'indirizzo da convertire
+     * @return L'indirizzo convertito
+     */
     public static String normalizzaIp(String bruttoIp) {
         String res = "";
         String[] arrOfStr;

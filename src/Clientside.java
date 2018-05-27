@@ -9,20 +9,20 @@ import java.net.MulticastSocket;
 import java.net.Socket;
 import javax.swing.*;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
- *
- * @author diù
+ * Prova di connessione multicast
+ * @deprecated 
  */
 public class Clientside {
 
     Socket socket = null;
     InetAddress group=null;
     MulticastSocket s=null;
+    
+    /**
+     * Inizializza la connessione 
+     * @deprecated 
+     */
     Clientside(){
         try {
             socket = new Socket(InetAddress.getLocalHost(), 10000);
@@ -33,6 +33,12 @@ public class Clientside {
             JOptionPane.showConfirmDialog(null, "Connessione Fallita", "Connessione", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+    /**
+     * Test dell'invio del testo 
+     * @param text Testo da inviare
+     * @deprecated 
+     */
     public String writing(String text) throws IOException {
         String temp = "";
         String buffer;
@@ -43,6 +49,11 @@ public class Clientside {
         }
         return temp;
     }
+    
+    /**
+     * Test dell'invio del testo in multicast
+     * @deprecated 
+     */
     public String writemulti()
     {
         String msg = "Hello";
