@@ -33,6 +33,7 @@ public class ShareIDE extends javax.swing.JFrame {
     private JMenuItem commenta;
     private boolean salva;
     private String file;
+    private Listening collabora;
     
     /**
      * Costruttore: inizializza i componenti principale dell'applicazione
@@ -67,8 +68,8 @@ public class ShareIDE extends javax.swing.JFrame {
         txtCode.setComponentPopupMenu(popup);
         /*Thread listenG=new Thread(new ListenGlobal(txtCode));
         listenG.start();*/
-        test = new Listening(txtCode);
-        test.execute();
+        /*test = new Listening(txtCode);
+        test.execute();*/
         tln = new TextLineNumber(txtCode);
         linenumber.setRowHeaderView(tln);
 
@@ -293,6 +294,8 @@ public class ShareIDE extends javax.swing.JFrame {
             lblNome.setText(nome);
             Thread lisPub=new Thread(new ListenPublic(nome));
             Thread lisReguest=new Thread(new ListenRequest(txtCode));
+            collabora = new Listening(txtCode);
+            collabora.execute();
             lisPub.start();
             lisReguest.start();
         } else {

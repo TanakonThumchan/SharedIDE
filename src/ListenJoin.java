@@ -86,7 +86,11 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                     ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
                     model.addRow(new Object[]{name, ip});
-                } else if (buf.get(0) == 8) {
+                }
+                else if (buf.get(0) == 5){
+                    
+                }
+                else if (buf.get(0) == 8) {
                     do {
                         lenght = buf.get(5);
                         offset = buf.getInt(1);
