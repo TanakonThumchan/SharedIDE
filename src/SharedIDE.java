@@ -19,9 +19,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * Finestra pricipale del programma 
+ * Finestra pricipale del programma
  */
-public class ShareIDE extends javax.swing.JFrame {
+public class SharedIDE extends javax.swing.JFrame {
 
     private Clientside client;
     private Listening test;
@@ -34,14 +34,15 @@ public class ShareIDE extends javax.swing.JFrame {
     private boolean salva;
     private String file;
     private Listening collabora;
-    
+
     /**
      * Costruttore: inizializza i componenti principale dell'applicazione
      */
-    public ShareIDE() {
+    public SharedIDE() {
         initComponents();
         Thread.currentThread().setName("Main");
-        salva=false;file="";
+        salva = false;
+        file = "";
         txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
         popup = new JPopupMenu("Popup Menu");
         copia = new JMenuItem("Copia");
@@ -68,7 +69,7 @@ public class ShareIDE extends javax.swing.JFrame {
         txtCode.setComponentPopupMenu(popup);
         /*Thread listenG=new Thread(new ListenGlobal(txtCode));
         listenG.start();*/
-        /*test = new Listening(txtCode);
+ /*test = new Listening(txtCode);
         test.execute();*/
         tln = new TextLineNumber(txtCode);
         linenumber.setRowHeaderView(tln);
@@ -239,9 +240,10 @@ public class ShareIDE extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-    
+
     /**
      * Avvia una finestra con le opzioni di ricerca del testo
+     *
      * @param evt evento click dell'opzione Cerca
      * @see SearchDialog
      */
@@ -251,7 +253,9 @@ public class ShareIDE extends javax.swing.JFrame {
     }//GEN-LAST:event_menuCercaActionPerformed
 
     /**
-     * Richiama il metodo 'commenta()' che trasforma il testo selezionato in commento Java
+     * Richiama il metodo 'commenta()' che trasforma il testo selezionato in
+     * commento Java
+     *
      * @param evt evento click dell'opzione Commenta
      */
     private void menuCommentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCommentaActionPerformed
@@ -259,7 +263,8 @@ public class ShareIDE extends javax.swing.JFrame {
     }//GEN-LAST:event_menuCommentaActionPerformed
 
     /**
-     * Avvia una finestra con le opzioni di ricerca e sostituzione  del testo
+     * Avvia una finestra con le opzioni di ricerca e sostituzione del testo
+     *
      * @param evt evento click dell'opzione Sostituisci
      * @see ReplaceDialog
      */
@@ -270,34 +275,45 @@ public class ShareIDE extends javax.swing.JFrame {
 
     /**
      * Avvia una finestra con la lista delle collaborazioni attive
+     *
      * @param evt evento click dell'opzione Join
      * @see JoinDialog
      */
     private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
-        JoinDialog j = new JoinDialog(this, true,txtCode);
+        JoinDialog j = new JoinDialog(this, true, txtCode);
         j.setVisible(true);
+        if (!j.isVisible()) {
+            
+                btnJoin.setText("Waiting..");
+                btnJoin.setEnabled(false);
+           
+        }
     }//GEN-LAST:event_btnJoinActionPerformed
-
+    
     /**
-     * Crea la collaborazione e resta in ascolto per le richieste di partecipazione degli altri host.
-     * Viene chiesto l'utente di inserire il nome della collaborazione.<br>
+     * Crea la collaborazione e resta in ascolto per le richieste di
+     * partecipazione degli altri host. Viene chiesto l'utente di inserire il
+     * nome della collaborazione.<br>
      * Se la collaborazione è gia attiva allora viene disattivata.
+     *
      * @param evt evento click dell'opzione Start
      * @see ListenPublic
      * @see ListenRequest
      */
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         if (click == false) {
-            click = true;
-            btnStart.setBackground(Color.GREEN);
-            String nome = (String)JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null,null);
-            lblNome.setText(nome);
-            Thread lisPub=new Thread(new ListenPublic(nome));
-            Thread lisReguest=new Thread(new ListenRequest(txtCode));
-            collabora = new Listening(txtCode);
-            collabora.execute();
-            lisPub.start();
-            lisReguest.start();
+            String nome = (String) JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null, null);
+            if (nome != null) {
+                click = true;
+                btnStart.setBackground(Color.GREEN);
+                lblNome.setText(nome);
+                Thread lisPub = new Thread(new ListenPublic(nome));
+                Thread lisReguest = new Thread(new ListenRequest(txtCode));
+                collabora = new Listening(txtCode);
+                collabora.execute();
+                lisPub.start();
+                lisReguest.start();
+            }
         } else {
             lblNome.setText(null);
             click = false;
@@ -308,20 +324,21 @@ public class ShareIDE extends javax.swing.JFrame {
     /**
      * Salva il file aperto<br>
      * Se è la prima volta apre la finestra salva con nome
-     * @param evt 
+     *
+     * @param evt
      */
     private void menuSalvaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalvaActionPerformed
-        if (salva!=false){
+        if (salva != false) {
             salva();
-        }
-        else 
-        {
+        } else {
             salvaNome();
         }
     }//GEN-LAST:event_menuSalvaActionPerformed
 
     /**
-     * Salva il file, compila il codice e restituisce il messaggio del compilatore
+     * Salva il file, compila il codice e restituisce il messaggio del
+     * compilatore
+     *
      * @param evt evento click dell'opzione Compila
      */
     private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {
@@ -331,7 +348,7 @@ public class ShareIDE extends javax.swing.JFrame {
             buffer = txtCode.getText();
             out.println(buffer);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             buffer = new String();
@@ -354,14 +371,15 @@ public class ShareIDE extends javax.swing.JFrame {
             System.out.println("Process exitValue: " + exitVal);
             JOptionPane.showMessageDialog(null, temp);
         } catch (IOException ex) {
-            Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
-            Logger.getLogger(ShareIDE.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     /**
      * Salva il file con il nome scelto dall'utente nella directory scelta
+     *
      * @param evt evento click dell'opzione Salva Con Nome
      */
     private void menuSalvaNomeActionPerformed(java.awt.event.ActionEvent evt) {
@@ -370,6 +388,7 @@ public class ShareIDE extends javax.swing.JFrame {
 
     /**
      * Mostra il contenuto del file scelto
+     *
      * @param evt evento click dell'opzione Apri
      * @see JFileChooser
      */
@@ -388,7 +407,7 @@ public class ShareIDE extends javax.swing.JFrame {
                 while ((line = reader.readLine()) != null) {
                     txtCode.append(line + System.lineSeparator());
                 }
-                file=fileToOpen.getAbsolutePath();
+                file = fileToOpen.getAbsolutePath();
             } catch (IOException e) {
                 JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -425,21 +444,22 @@ public class ShareIDE extends javax.swing.JFrame {
         txtCode.insert("/*", start);
         txtCode.insert("*/", end + 2);
     }
-    
+
     /**
      * Salva il file
      */
-    public void salva(){
+    public void salva() {
         BufferedWriter out;
         File fileToSave = new File(file);
-        
+
     }
-    
+
     /**
      * Salva il file con il nome scelto dall'utente nella directory scelta
+     *
      * @see JFileChooser
      */
-    public void salvaNome(){
+    public void salvaNome() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -455,8 +475,8 @@ public class ShareIDE extends javax.swing.JFrame {
                 out = new BufferedWriter(new FileWriter(fileToSave));
                 out.write(txtCode.getText());
                 out.close();
-                salva=true;
-                file=fileToSave.getAbsolutePath();
+                salva = true;
+                file = fileToSave.getAbsolutePath();
             } catch (IOException ex) {
                 JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -477,13 +497,13 @@ public class ShareIDE extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SharedIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SharedIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SharedIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ShareIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SharedIDE.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         //</editor-fold>
@@ -491,7 +511,7 @@ public class ShareIDE extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ShareIDE().setVisible(true);
+                new SharedIDE().setVisible(true);
             }
         });
     }

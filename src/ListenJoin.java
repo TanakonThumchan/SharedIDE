@@ -4,13 +4,14 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import javax.swing.JDialog;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
@@ -26,15 +27,19 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
     JTable temp = new JTable();
     DefaultTableModel model;
     JTextArea code;
-
+    public Socket socket;
+    public ServerSocket listener;
+    JDialog parent;
     /**
      * Inizializza alcuni componenti grafici
      *
      * @param tblCanali Tabella contenente la lista delle collaborazione
      * disponibile
      * @param txtCode Casella di testo per scrivere il codice
+     * @param parent finestra di selezione elenco delle collaborazione
      */
-    public ListenJoin(JTable tblCanali, JTextArea txtCode) {
+    public ListenJoin(JTable tblCanali, JTextArea txtCode,JDialog parent) {
+        this.parent=parent;
         temp = tblCanali;
         code = txtCode;
         model = (DefaultTableModel) temp.getModel();
@@ -46,20 +51,19 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
     @Override
     protected Void doInBackground() throws Exception {
         try {
-            ServerSocket listener = new ServerSocket(9090);
-            try {
-                while (true) {
-                    Socket socket = listener.accept();
-                    publish(socket);
-                }
-            } finally {
-                listener.close();
+            listener = new ServerSocket(9090);
+
+            while (true) {
+
+                socket = new Socket();
+                socket = listener.accept();
+                publish(socket);
             }
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Errr");
-            Logger.getLogger(ListenGlobal.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (SocketException ex) {
+            System.out.println(ex);
+            return null;
         }
-        return null;
     }
 
     /**
@@ -67,6 +71,7 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
      * ricevuto può aggionare la lista delle collaborazione disponibile o
      * ricevere il testo iniziale dagli altri client quando si è appena
      * collegato alla collaborazione
+     *
      * @param socks Collegameto socket
      */
     @Override
@@ -86,11 +91,9 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                     ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
                     model.addRow(new Object[]{name, ip});
-                }
-                else if (buf.get(0) == 5){
-                    
-                }
-                else if (buf.get(0) == 8) {
+                } else if (buf.get(0) == 5) {
+
+                } else if (buf.get(0) == 8) {
                     do {
                         lenght = buf.get(5);
                         offset = buf.getInt(1);
@@ -102,7 +105,8 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                             buf = ByteBuffer.wrap(buffer);
                             Thread.currentThread().setName("Main");
                         }
-                    } while (buf.get(0) == 8 && lenght == 125);
+                    } while (buf.get(0) == 8 && lenght == 125); 
+                    parent.dispose();
                 }
                 socket.close();
             } catch (IOException ex) {

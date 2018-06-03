@@ -17,7 +17,8 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * Finestra con elenco delle collaborazione disponibile <br>
- * L'utente sceglie il suo username e può inviare la rischiesta di collaborazione 
+ * L'utente sceglie il suo username e può inviare la rischiesta di
+ * collaborazione
  */
 public class JoinDialog extends javax.swing.JDialog {
 
@@ -31,18 +32,19 @@ public class JoinDialog extends javax.swing.JDialog {
 
     /**
      * Inizializza i componenti grafici e stabilisce una connessione <br>
-     * Avvia un thread in ascolto per ricevere dei pacchetti 
+     * Avvia un thread in ascolto per ricevere dei pacchetti
+     *
      * @param parent Finestra madre
      * @param modal Modalità di apertura
      * @param txtCode Casella di testo
      * @see ListenJoin
      * @see MulticastSocket
-     */ 
-    public JoinDialog(java.awt.Frame parent, boolean modal,JTextArea txtCode) {
+     */
+    public JoinDialog(java.awt.Frame parent, boolean modal, JTextArea txtCode) {
         super(parent, modal);
         initComponents();
         timer = new Timer();
-        thread = new ListenJoin(tblCanali,txtCode);
+        thread = new ListenJoin(tblCanali, txtCode,this);
         thread.execute();
         model = (DefaultTableModel) tblCanali.getModel();
         try {
@@ -163,15 +165,24 @@ public class JoinDialog extends javax.swing.JDialog {
 
     /**
      * Chiusura della finestra
+     *
      * @param evt evento click dell'opzione Annulla
      */
     private void btnAnnullaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnnullaActionPerformed
-        thread.cancel(true);
+        try {
+            thread.listener.close();
+            thread.socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(thread.cancel(true));
+        timer.cancel();
         this.dispose();
     }//GEN-LAST:event_btnAnnullaActionPerformed
 
     /**
      * Invia la rischista partecipazione alla collaborazione selezionato
+     *
      * @param evt evento click dell'opzione Entra
      * @see Socket
      */
@@ -200,6 +211,7 @@ public class JoinDialog extends javax.swing.JDialog {
                 out.write(bytebu.array());
                 client.close();
                 out.close();
+                btnEntra.setEnabled(false);
             } catch (Exception E) {
                 JOptionPane.showConfirmDialog(null, "Seleziona un host", "", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -211,6 +223,7 @@ public class JoinDialog extends javax.swing.JDialog {
 
     /**
      * Avvia la funzione aggiorna che viene eseguita periodicamente
+     *
      * @param evt evento apertura della finestra
      * @see Timer
      */
@@ -224,11 +237,19 @@ public class JoinDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowOpened
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        thread.cancel(true);
+        try {
+            thread.listener.close();
+            thread.socket.close();
+        } catch (IOException ex) {
+            Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println(thread.cancel(true));
+        timer.cancel();
+        this.dispose();
     }//GEN-LAST:event_formWindowClosed
 
     /**
-     * Invia un messaggio di ricerca in broadcast per ricevere poi la risposta 
+     * Invia un messaggio di ricerca in broadcast per ricevere poi la risposta
      */
     public void aggiorna() {
         ByteBuffer buffer = ByteBuffer.allocate(31);
@@ -256,6 +277,7 @@ public class JoinDialog extends javax.swing.JDialog {
 
     /**
      * Trasforma l'indirizzo IP in un formato stabilito
+     *
      * @param bruttoIp L'indirizzo da convertire
      * @return L'indirizzo convertito
      */

@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -26,11 +27,12 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
     private int pos;
     private DefaultCaret caret;
     public int port;
+
     /**
      * @param txtCode Casela di testo
      */
     public Listening(JTextArea txtCode) {
-        port=3000;
+        port = 3000;
         temp = txtCode;
         caret = (DefaultCaret) txtCode.getCaret();
         caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
@@ -85,6 +87,8 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
                 temp.insert(tempo, offset);
             } else if (message.get(0) == 1) {
                 temp.replaceRange("", offset, offset + lenght);
+            } else if (message.get(0) == 9) {
+                responseCheck();
             }
             //JOptionPane.showMessageDialog(null, tempo);
             //pos = temp.getCaretPosition();
@@ -99,27 +103,56 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
      * Invia un messaggio per verificare se il canale è libero
      */
     public void portCheck() {
-        while(true){
+        while (true) {
             try {
                 InetAddress group = InetAddress.getByName("228.5.6.7");
                 MulticastSocket s = new MulticastSocket(port);
                 //s.setLoopbackMode(true);
+                s.setSoTimeout(5000);
+                s.joinGroup(group);
                 ByteBuffer buffer = ByteBuffer.allocate(5);
-                buffer.put((byte)9);
+                buffer.put((byte) 9);
                 buffer.putInt(0);
                 DatagramPacket packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, port);
                 s.send(packet);
                 byte[] buf = new byte[256];
-                DatagramPacket recv = new DatagramPacket(buf, buf.length);
-                s.setSoTimeout(200);
+                DatagramPacket recv = new DatagramPacket(buf, buf.length);                
                 s.receive(recv);
-                s.joinGroup(group);
+                buffer=ByteBuffer.wrap(buf);
+                if (buffer.get(0)!=10){
+                    System.out.println(port);
+                    break;
+                }
+                s.leaveGroup(group);
                 port++;
-            } catch (Exception e) {
+            } catch (SocketTimeoutException e) {
                 /*System.out.println(e.getMessage());
                 System.out.println("si");*/
+                System.out.println(port);
                 break;
             }
+            catch(Exception e){
+                port++;
+                continue;
+            }
+        }
+    }
+
+    /**
+     *
+     */
+    public void responseCheck() {
+        try {
+            System.out.println("resp");
+            InetAddress group = InetAddress.getByName("228.5.6.7");
+            MulticastSocket s = new MulticastSocket(port);
+            ByteBuffer buffer = ByteBuffer.allocate(5);
+            buffer.put((byte) 10);
+            buffer.putInt(0);
+            DatagramPacket packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, port);
+            s.send(packet);
+        } catch (Exception e) {
+
         }
     }
 }
