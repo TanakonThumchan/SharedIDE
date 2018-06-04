@@ -280,16 +280,22 @@ public class SharedIDE extends javax.swing.JFrame {
      * @see JoinDialog
      */
     private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
-        JoinDialog j = new JoinDialog(this, true, txtCode);
-        j.setVisible(true);
-        if (!j.isVisible()) {
-            
-                btnJoin.setText("Waiting..");
-                btnJoin.setEnabled(false);
-           
+        if (JoinDialog.accepted == false) {
+            JoinDialog j = new JoinDialog(this, true, txtCode);
+            j.setVisible(true);
+            if (!j.isVisible()) {
+                if (JoinDialog.accepted == true) {
+                    btnJoin.setText("Disconnect");
+                } else {
+                    JOptionPane.showConfirmDialog(null, "Richiesta rifiutata", "Rifiutata", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+        else{
+            btnJoin.setText("Join");
         }
     }//GEN-LAST:event_btnJoinActionPerformed
-    
+
     /**
      * Crea la collaborazione e resta in ascolto per le richieste di
      * partecipazione degli altri host. Viene chiesto l'utente di inserire il
@@ -303,7 +309,7 @@ public class SharedIDE extends javax.swing.JFrame {
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         if (click == false) {
             String nome = (String) JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null, null);
-            if (nome != null) {
+            if (nome != null && !nome.equals("")) {
                 click = true;
                 btnStart.setBackground(Color.GREEN);
                 lblNome.setText(nome);

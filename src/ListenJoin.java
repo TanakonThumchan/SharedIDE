@@ -30,6 +30,8 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
     public Socket socket;
     public ServerSocket listener;
     JDialog parent;
+    public static int port;
+
     /**
      * Inizializza alcuni componenti grafici
      *
@@ -38,8 +40,8 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
      * @param txtCode Casella di testo per scrivere il codice
      * @param parent finestra di selezione elenco delle collaborazione
      */
-    public ListenJoin(JTable tblCanali, JTextArea txtCode,JDialog parent) {
-        this.parent=parent;
+    public ListenJoin(JTable tblCanali, JTextArea txtCode, JDialog parent) {
+        this.parent = parent;
         temp = tblCanali;
         code = txtCode;
         model = (DefaultTableModel) temp.getModel();
@@ -90,26 +92,37 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                 if (buf.get(0) == 3) {
                     ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
+                    //name = new String(Arrays.copyOfRange(buf.array(), 1, 255), Charset.forName("UTF-16BE"));
                     model.addRow(new Object[]{name, ip});
+                    //model.addRow(new Object[]{name, socket.getInetAddress()});
                 } else if (buf.get(0) == 5) {
-
-                } else if (buf.get(0) == 8) {
-                    do {
-                        lenght = buf.get(5);
-                        offset = buf.getInt(1);
-                        if (lenght > 0) {
-                            Thread.currentThread().setName("CIAO");
-                            msg = new String(Arrays.copyOfRange(buf.array(), 6, 6 + (lenght * 2)), Charset.forName("UTF-16BE"));
-                            code.insert(msg, offset);
-                            in.read(buffer);
-                            buf = ByteBuffer.wrap(buffer);
-                            Thread.currentThread().setName("Main");
-                        }
-                    } while (buf.get(0) == 8 && lenght == 125); 
-                    parent.dispose();
+                    JoinDialog.accepted = true;
+                    port = buf.getInt(1);
+                    in.read(buffer);
+                    buf = ByteBuffer.wrap(buffer);
+                    if (buf.get(0) == 8 && port>0) {
+                        do {
+                            lenght = buf.get(5);
+                            offset = buf.getInt(1);
+                            if (lenght > 0) {
+                                Thread.currentThread().setName("CIAO");
+                                msg = new String(Arrays.copyOfRange(buf.array(), 6, 6 + (lenght * 2)), Charset.forName("UTF-16BE"));
+                                code.insert(msg, offset);
+                                in.read(buffer);
+                                buf = ByteBuffer.wrap(buffer);
+                                Thread.currentThread().setName("Main");
+                            }
+                        } while (buf.get(0) == 8 && lenght == 125);
+                        parent.dispose();
+                    }
+                    else{
+                        JoinDialog.accepted=false;
+                        parent.dispose();
+                    }
                 }
                 socket.close();
             } catch (IOException ex) {
+                System.out.println(ex+"ddssdf");
                 Logger.getLogger(ListenJoin.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

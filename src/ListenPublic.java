@@ -13,8 +13,9 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
- * Thread in ascolto per ricevere gli evetuali messaggi di ricerca dagli altri client per poi rispondere 
- * inviando le informazione riguardante la propria collaborazione
+ * Thread in ascolto per ricevere gli evetuali messaggi di ricerca dagli altri
+ * client per poi rispondere inviando le informazione riguardante la propria
+ * collaborazione
  */
 public class ListenPublic implements Runnable {
 
@@ -22,10 +23,11 @@ public class ListenPublic implements Runnable {
 
     /**
      * Inizializza il nome della collaborazione
+     *
      * @param name Nome della collaborazione
      */
     public ListenPublic(String name) {
-        this.name=name;
+        this.name = name;
     }
 
     /**
@@ -49,10 +51,11 @@ public class ListenPublic implements Runnable {
                     buffer = Arrays.copyOfRange(bytebu.array(), 1, 31);
                     address = new String(buffer, Charset.forName("UTF-16BE"));
                     InetAddress host = InetAddress.getByName(address);
+                    //InetAddress host = recv.getAddress();
                     try {
                         Socket client = new Socket(host, 9090);
                         DataOutputStream out = new DataOutputStream(client.getOutputStream());
-                        bytebu = ByteBuffer.allocate(256);                        
+                        bytebu = ByteBuffer.allocate(256);
                         InetAddress localHost = InetAddress.getLocalHost();
                         address = normalizzaIp(localHost.getHostAddress());
                         bytebu.put(0, (byte) 3);
@@ -60,7 +63,7 @@ public class ListenPublic implements Runnable {
                         for (int i = 0; i < 15; i++) {
                             bytebu.putChar(address.charAt(i));
                         }
-                        for(int i=0;i<name.length();i++){
+                        for (int i = 0; i < name.length(); i++) {
                             bytebu.putChar(name.charAt(i));
                         }
                         out.write(bytebu.array());
@@ -79,6 +82,7 @@ public class ListenPublic implements Runnable {
 
     /**
      * Trasforma l'indirizzo IP in un formato stabilito
+     *
      * @param bruttoIp L'indirizzo da convertire
      * @return L'indirizzo convertito
      */

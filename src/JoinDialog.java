@@ -28,7 +28,8 @@ public class JoinDialog extends javax.swing.JDialog {
     private MulticastSocket s;
     private DatagramPacket packet;
     private ListenJoin thread;
-    DefaultTableModel model;
+    private DefaultTableModel model;
+    public static boolean accepted;
 
     /**
      * Inizializza i componenti grafici e stabilisce una connessione <br>
@@ -199,7 +200,7 @@ public class JoinDialog extends javax.swing.JDialog {
                 DataOutputStream out = new DataOutputStream(client.getOutputStream());
                 ByteBuffer bytebu = ByteBuffer.allocate(256);
                 InetAddress localHost = InetAddress.getLocalHost();
-                address = normalizzaIp(localHost.getHostAddress());
+                address = ListenPublic.normalizzaIp(localHost.getHostAddress());
                 bytebu.put(0, (byte) 4);
                 bytebu.position(1);
                 for (int i = 0; i < 15; i++) {
@@ -257,7 +258,7 @@ public class JoinDialog extends javax.swing.JDialog {
         model.setRowCount(0);
         try {
             InetAddress localHost = InetAddress.getLocalHost();
-            address = normalizzaIp(localHost.getHostAddress());
+            address = ListenPublic.normalizzaIp(localHost.getHostAddress());
         } catch (UnknownHostException ex) {
             Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -273,38 +274,7 @@ public class JoinDialog extends javax.swing.JDialog {
         } catch (IOException ex) {
             Logger.getLogger(JoinDialog.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    /**
-     * Trasforma l'indirizzo IP in un formato stabilito
-     *
-     * @param bruttoIp L'indirizzo da convertire
-     * @return L'indirizzo convertito
-     */
-    public static String normalizzaIp(String bruttoIp) {
-        String res = "";
-        String[] arrOfStr;
-        arrOfStr = bruttoIp.split("\\.");
-        for (int j = 0; j < 4; j++) {
-            switch (arrOfStr[j].length()) {
-                case 1:
-                    res += "00" + arrOfStr[j];
-                    break;
-                case 2:
-                    res += "0" + arrOfStr[j];
-                    break;
-                case 3:
-                    res += arrOfStr[j];
-                    break;
-                default:
-                    res = "Invalid ip";
-                    break;
-            }
-            res += ".";
-        }
-        String newstr = res.substring(0, 15);
-        return newstr;
-    }
+    }    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAnnulla;

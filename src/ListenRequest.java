@@ -3,6 +3,7 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -61,6 +62,17 @@ public class ListenRequest implements Runnable {
                     int lenght = text.length();
                     int offset = 0;
                     try {
+                        InetAddress localHost = InetAddress.getLocalHost();
+                        String address = ListenPublic.normalizzaIp(localHost.getHostAddress());
+                        buf = ByteBuffer.allocate(256);
+                        buf.put(0, (byte) 5);
+                        buf.position(1);
+                        /*for (int i = 0; i < 15; i++) {
+                            buf.putChar(address.charAt(i));
+                        }*/
+                        buf.putInt(Listening.port);
+                        out.write(buf.array());
+                        
                         if (lenght <= 125) {
                             buf = ByteBuffer.allocate((lenght * 2) + 6);
                             buf.put(0, (byte) 8);
@@ -101,12 +113,10 @@ public class ListenRequest implements Runnable {
 
                     }
                 } else if (resul == JOptionPane.NO_OPTION) {
-                    buf = ByteBuffer.allocate(6);
-                    buf.put(0, (byte) 8);
+                    buf = ByteBuffer.allocate(5);
+                    buf.put(0, (byte) 5);
                     buf.putInt(1, 0);
-                    buf.put(5, (byte) 0);
                     out.write(buf.array());
-
                     out.close();
                     client.close();
                 }

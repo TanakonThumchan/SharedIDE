@@ -26,7 +26,7 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
     private JTextArea temp;
     private int pos;
     private DefaultCaret caret;
-    public int port;
+    public static int port;
 
     /**
      * @param txtCode Casela di testo
@@ -139,7 +139,7 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
     }
 
     /**
-     *
+     * Segnala che il canale è gia occupata
      */
     public void responseCheck() {
         try {
