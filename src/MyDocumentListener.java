@@ -27,16 +27,17 @@ public class MyDocumentListener implements DocumentListener {
     private DatagramPacket packet;
     private JTextArea temp;
     private Element elem;
-
+    private int port;
     /**
      * Inizializza la connessione
      * @param txtCode Casella di testo
      */
-    public MyDocumentListener(JTextArea txtCode) {
+    public MyDocumentListener(JTextArea txtCode,int port) {
         temp = txtCode;
+        this.port=port;
         try {
             group = InetAddress.getByName("228.5.6.7");
-            s = new MulticastSocket(6789);
+            s = new MulticastSocket(port);
             //s.setLoopbackMode(true);
             s.joinGroup(group);
             //packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);
@@ -183,7 +184,7 @@ public class MyDocumentListener implements DocumentListener {
      */
     public void sendBuffer(ByteBuffer buffer) {
         try {
-            packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, 6789);
+            packet = new DatagramPacket(buffer.array(), buffer.capacity(), group, port);
             msg = new String(buffer.array());
             System.out.println(Arrays.toString(buffer.array()));
             //System.out.println(buffer.getChar(6));

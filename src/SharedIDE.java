@@ -17,6 +17,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.Document;
 
 /**
  * Finestra pricipale del programma
@@ -34,7 +35,10 @@ public class SharedIDE extends javax.swing.JFrame {
     private boolean salva;
     private String file;
     private Listening collabora;
-
+    private MyDocumentListener textChange;
+    private Thread lisPub;
+    private Thread lisReguest;
+    
     /**
      * Costruttore: inizializza i componenti principale dell'applicazione
      */
@@ -43,7 +47,7 @@ public class SharedIDE extends javax.swing.JFrame {
         Thread.currentThread().setName("Main");
         salva = false;
         file = "";
-        txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
+        //txtCode.getDocument().addDocumentListener(new MyDocumentListener(txtCode));
         popup = new JPopupMenu("Popup Menu");
         copia = new JMenuItem("Copia");
         copia.addActionListener(new java.awt.event.ActionListener() {
@@ -286,12 +290,17 @@ public class SharedIDE extends javax.swing.JFrame {
             if (!j.isVisible()) {
                 if (JoinDialog.accepted == true) {
                     btnJoin.setText("Disconnect");
-                } else {
-                    JOptionPane.showConfirmDialog(null, "Richiesta rifiutata", "Rifiutata", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                    collabora = new Listening(txtCode,ListenJoin.port);
+                    collabora.execute();
+                    textChange= new MyDocumentListener(txtCode,ListenJoin.port);
+                    txtCode.getDocument().addDocumentListener(textChange);
                 }
             }
         }
         else{
+            collabora.s.close();
+            collabora.cancel(true);
+            txtCode.getDocument().removeDocumentListener(textChange);
             btnJoin.setText("Join");
         }
     }//GEN-LAST:event_btnJoinActionPerformed
@@ -313,14 +322,19 @@ public class SharedIDE extends javax.swing.JFrame {
                 click = true;
                 btnStart.setBackground(Color.GREEN);
                 lblNome.setText(nome);
-                Thread lisPub = new Thread(new ListenPublic(nome));
-                Thread lisReguest = new Thread(new ListenRequest(txtCode));
+                lisPub = new Thread(new ListenPublic(nome));
+                lisReguest = new Thread(new ListenRequest(txtCode));
                 collabora = new Listening(txtCode);
                 collabora.execute();
                 lisPub.start();
                 lisReguest.start();
+                textChange=new MyDocumentListener(txtCode,collabora.port);
+                txtCode.getDocument().addDocumentListener(textChange);
             }
         } else {
+            collabora.s.close();
+            collabora.cancel(true);
+            txtCode.getDocument().removeDocumentListener(textChange);
             lblNome.setText(null);
             click = false;
             btnStart.setBackground(null);

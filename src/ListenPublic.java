@@ -20,7 +20,6 @@ import javax.swing.JOptionPane;
 public class ListenPublic implements Runnable {
 
     String name;
-
     /**
      * Inizializza il nome della collaborazione
      *

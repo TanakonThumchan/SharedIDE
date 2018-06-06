@@ -27,7 +27,7 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
     private int pos;
     private DefaultCaret caret;
     public static int port;
-
+    public MulticastSocket s;
     /**
      * @param txtCode Casela di testo
      */
@@ -38,6 +38,13 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
         caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
         portCheck();
     }
+    
+    public Listening(JTextArea txtCode,int port){
+        this.port = port;
+        temp = txtCode;
+        caret = (DefaultCaret) txtCode.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
+    }
 
     /**
      * Stabilisce la connessione e riceve i pacchetti
@@ -46,7 +53,7 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
     protected Void doInBackground() throws Exception {
         try {
             InetAddress group = InetAddress.getByName("228.5.6.7");
-            MulticastSocket s = new MulticastSocket(port);
+            s = new MulticastSocket(port);
             //s.setLoopbackMode(true);
             s.joinGroup(group);
             while (true) {
@@ -58,7 +65,7 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null, "Errr");
-            Logger.getLogger(Listening.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(Listening.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
     }

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
@@ -101,6 +102,7 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                     in.read(buffer);
                     buf = ByteBuffer.wrap(buffer);
                     if (buf.get(0) == 8 && port>0) {
+                        code.setText("");
                         do {
                             lenght = buf.get(5);
                             offset = buf.getInt(1);
@@ -116,6 +118,7 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                         parent.dispose();
                     }
                     else{
+                        JOptionPane.showConfirmDialog(null, "Richiesta rifiutata", "Rifiutata", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                         JoinDialog.accepted=false;
                         parent.dispose();
                     }
