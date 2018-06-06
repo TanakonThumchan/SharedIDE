@@ -50,7 +50,8 @@ public class ListenRequest implements Runnable {
                 in.read(buffer);
                 ByteBuffer buf = ByteBuffer.wrap(buffer);
                 if (buf.get(0) == 4) {
-                    ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
+                    //ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
+                    ip=socket.getInetAddress().toString().replace("/", "");
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
                 }
                 int resul = JOptionPane.showConfirmDialog(null, name, "Richiesta", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);

@@ -49,8 +49,8 @@ public class ListenPublic implements Runnable {
                     byte[] buffer;
                     buffer = Arrays.copyOfRange(bytebu.array(), 1, 31);
                     address = new String(buffer, Charset.forName("UTF-16BE"));
-                    InetAddress host = InetAddress.getByName(address);
-                    //InetAddress host = recv.getAddress();
+                    //InetAddress host = InetAddress.getByName(address);
+                    InetAddress host = recv.getAddress();
                     try {
                         Socket client = new Socket(host, 9090);
                         DataOutputStream out = new DataOutputStream(client.getOutputStream());

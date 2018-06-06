@@ -94,8 +94,8 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                     ip = new String(Arrays.copyOfRange(buf.array(), 1, 31), Charset.forName("UTF-16BE"));
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
                     //name = new String(Arrays.copyOfRange(buf.array(), 1, 255), Charset.forName("UTF-16BE"));
-                    model.addRow(new Object[]{name, ip});
-                    //model.addRow(new Object[]{name, socket.getInetAddress()});
+                    //model.addRow(new Object[]{name, ip});
+                    model.addRow(new Object[]{name, socket.getInetAddress().toString().replace("/", "")});
                 } else if (buf.get(0) == 5) {
                     JoinDialog.accepted = true;
                     port = buf.getInt(1);

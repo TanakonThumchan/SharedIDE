@@ -54,7 +54,7 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
         try {
             InetAddress group = InetAddress.getByName("228.5.6.7");
             s = new MulticastSocket(port);
-            //s.setLoopbackMode(true);
+            s.setLoopbackMode(true);
             s.joinGroup(group);
             while (true) {
                 byte[] buf = new byte[256];
