@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 
 /**
  * Thread in ascolto per ricevere gli evetuali messaggi di ricerca dagli altri
@@ -19,7 +18,8 @@ import javax.swing.JOptionPane;
  */
 public class ListenPublic implements Runnable {
 
-    String name;
+    private String name;
+    public MulticastSocket s;
     /**
      * Inizializza il nome della collaborazione
      *
@@ -36,8 +36,8 @@ public class ListenPublic implements Runnable {
     public void run() {
         try {
             InetAddress group = InetAddress.getByName("228.5.6.7");
-            MulticastSocket s = new MulticastSocket(6789);
-            //s.setLoopbackMode(true);
+            s = new MulticastSocket(6789);
+            s.setLoopbackMode(true);
             s.joinGroup(group);
             while (true) {
                 byte[] buf = new byte[256];
@@ -74,7 +74,7 @@ public class ListenPublic implements Runnable {
                 }
             }
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Errr");
+            //JOptionPane.showMessageDialog(null, "Errr");
             Logger.getLogger(ListenPublic.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

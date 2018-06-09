@@ -13,11 +13,11 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.Document;
 
 /**
  * Finestra pricipale del programma
@@ -38,12 +38,15 @@ public class SharedIDE extends javax.swing.JFrame {
     private MyDocumentListener textChange;
     private Thread lisPub;
     private Thread lisReguest;
-    
+    private ListenPublic lisPubRn;
+    private ListenRequest lisReqRn;
+
     /**
      * Costruttore: inizializza i componenti principale dell'applicazione
      */
     public SharedIDE() {
         initComponents();
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         Thread.currentThread().setName("Main");
         salva = false;
         file = "";
@@ -105,7 +108,7 @@ public class SharedIDE extends javax.swing.JFrame {
         menuJavaDoc = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Share IDE");
+        setTitle("SharedIDE");
 
         btnCompila.setText("Compila");
         btnCompila.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -211,7 +214,7 @@ public class SharedIDE extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
                     .addComponent(linenumber))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -226,7 +229,7 @@ public class SharedIDE extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(linenumber, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                    .addComponent(linenumber, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblNome, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -240,6 +243,8 @@ public class SharedIDE extends javax.swing.JFrame {
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6))
         );
+
+        getAccessibleContext().setAccessibleName("SharedIDE");
 
         pack();
         setLocationRelativeTo(null);
@@ -290,18 +295,18 @@ public class SharedIDE extends javax.swing.JFrame {
             if (!j.isVisible()) {
                 if (JoinDialog.accepted == true) {
                     btnJoin.setText("Disconnect");
-                    collabora = new Listening(txtCode,ListenJoin.port);
+                    collabora = new Listening(txtCode, ListenJoin.port);
                     collabora.execute();
-                    textChange= new MyDocumentListener(txtCode,ListenJoin.port);
+                    textChange = new MyDocumentListener(txtCode, ListenJoin.port);
                     txtCode.getDocument().addDocumentListener(textChange);
                 }
             }
-        }
-        else{
+        } else {
             collabora.s.close();
             collabora.cancel(true);
             txtCode.getDocument().removeDocumentListener(textChange);
             btnJoin.setText("Join");
+            JoinDialog.accepted=false;
         }
     }//GEN-LAST:event_btnJoinActionPerformed
 
@@ -322,18 +327,29 @@ public class SharedIDE extends javax.swing.JFrame {
                 click = true;
                 btnStart.setBackground(Color.GREEN);
                 lblNome.setText(nome);
-                lisPub = new Thread(new ListenPublic(nome));
-                lisReguest = new Thread(new ListenRequest(txtCode));
+
+                lisPubRn = new ListenPublic(nome);
+                lisReqRn = new ListenRequest(txtCode);
+
+                lisPub = new Thread(lisPubRn);
+                lisReguest = new Thread(lisReqRn);
+
                 collabora = new Listening(txtCode);
                 collabora.execute();
                 lisPub.start();
                 lisReguest.start();
-                textChange=new MyDocumentListener(txtCode,collabora.port);
+                textChange = new MyDocumentListener(txtCode, collabora.port);
                 txtCode.getDocument().addDocumentListener(textChange);
             }
         } else {
             collabora.s.close();
             collabora.cancel(true);
+            lisPubRn.s.close();
+            try {
+                lisReqRn.listener.close();
+            } catch (IOException ex) {
+                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+            }
             txtCode.getDocument().removeDocumentListener(textChange);
             lblNome.setText(null);
             click = false;
@@ -428,6 +444,7 @@ public class SharedIDE extends javax.swing.JFrame {
                     txtCode.append(line + System.lineSeparator());
                 }
                 file = fileToOpen.getAbsolutePath();
+                salva = true;
             } catch (IOException e) {
                 JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -471,6 +488,14 @@ public class SharedIDE extends javax.swing.JFrame {
     public void salva() {
         BufferedWriter out;
         File fileToSave = new File(file);
+        try {
+            out = new BufferedWriter(new FileWriter(fileToSave));
+            out.write(txtCode.getText());
+            out.close();
+            salva = true;
+        } catch (IOException ex) {
+            JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        }
 
     }
 

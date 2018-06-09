@@ -48,6 +48,7 @@ public class SearchDialog extends javax.swing.JDialog {
         btnAnnulla = new javax.swing.JButton();
         txtCerca = new javax.swing.JTextField();
         btnTrova = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -77,6 +78,8 @@ public class SearchDialog extends javax.swing.JDialog {
             }
         });
 
+        jLabel1.setText("Testo da cercare:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -91,13 +94,18 @@ public class SearchDialog extends javax.swing.JDialog {
                         .addComponent(btnTrova)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAnnulla))
-                    .addComponent(txtCerca))
+                    .addComponent(txtCerca)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(31, 31, 31)
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtCerca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -106,6 +114,8 @@ public class SearchDialog extends javax.swing.JDialog {
                     .addComponent(btnTrova))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        getAccessibleContext().setAccessibleName("Cerca");
 
         pack();
         setLocationRelativeTo(null);
@@ -198,6 +208,7 @@ public class SearchDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnAnnulla;
     private javax.swing.JButton btnCerca;
     private javax.swing.JButton btnTrova;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JTextField txtCerca;
     // End of variables declaration//GEN-END:variables
 }

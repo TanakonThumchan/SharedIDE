@@ -38,7 +38,7 @@ public class MyDocumentListener implements DocumentListener {
         try {
             group = InetAddress.getByName("228.5.6.7");
             s = new MulticastSocket(port);
-            //s.setLoopbackMode(true);
+            s.setLoopbackMode(true);
             s.joinGroup(group);
             //packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);
         } catch (IOException ex) {

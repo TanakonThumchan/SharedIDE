@@ -51,7 +51,7 @@ public class JoinDialog extends javax.swing.JDialog {
         try {
             group = InetAddress.getByName("228.5.6.7");
             s = new MulticastSocket(6789);
-            //s.setLoopbackMode(true);
+            s.setLoopbackMode(true);
             s.joinGroup(group);
             //packet = new DatagramPacket(msg.getBytes(), msg.length(),group, 6789);
         } catch (IOException ex) {

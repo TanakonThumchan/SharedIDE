@@ -20,12 +20,14 @@ import javax.swing.JTextArea;
  */
 public class ListenRequest implements Runnable {
 
-    JTextArea temp;
-
+    private JTextArea temp;
+    public Socket socket;
+    public ServerSocket listener;
     /**
      * @param txtCode Casella di testo
      */
     public ListenRequest(JTextArea txtCode) {
+        Thread.currentThread().setName("ListenRequest");
         temp = txtCode;
     }
 
@@ -37,12 +39,11 @@ public class ListenRequest implements Runnable {
     @Override
     public void run() {
         byte[] buffer;
-        Socket socket;
         DataInputStream in;
         String ip = "";
         String name = "";
         try {
-            ServerSocket listener = new ServerSocket(9091);
+            listener = new ServerSocket(9091);
             while (true) {
                 buffer = new byte[256];
                 socket = listener.accept();
