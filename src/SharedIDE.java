@@ -2,6 +2,7 @@
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -99,8 +103,10 @@ public class SharedIDE extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         menuApri = new javax.swing.JMenuItem();
+        menuApriOnline = new javax.swing.JMenuItem();
         menuSalva = new javax.swing.JMenuItem();
         menuSalvaNome = new javax.swing.JMenuItem();
+        menuSalvaOnline = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         menuCerca = new javax.swing.JMenuItem();
         menuSostituisci = new javax.swing.JMenuItem();
@@ -138,7 +144,6 @@ public class SharedIDE extends javax.swing.JFrame {
 
         txtCode.setColumns(20);
         txtCode.setRows(5);
-        txtCode.setTabSize(4);
         linenumber.setViewportView(txtCode);
 
         lblNome.setToolTipText("");
@@ -156,6 +161,14 @@ public class SharedIDE extends javax.swing.JFrame {
         });
         jMenu1.add(menuApri);
 
+        menuApriOnline.setText("Apri online");
+        menuApriOnline.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuApriOnlineActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuApriOnline);
+
         menuSalva.setText("Salva");
         menuSalva.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -171,6 +184,14 @@ public class SharedIDE extends javax.swing.JFrame {
             }
         });
         jMenu1.add(menuSalvaNome);
+
+        menuSalvaOnline.setText("Salva online");
+        menuSalvaOnline.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSalvaOnlineActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuSalvaOnline);
 
         jMenuBar1.add(jMenu1);
 
@@ -244,8 +265,6 @@ public class SharedIDE extends javax.swing.JFrame {
                 .addGap(6, 6, 6))
         );
 
-        getAccessibleContext().setAccessibleName("SharedIDE");
-
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -306,7 +325,7 @@ public class SharedIDE extends javax.swing.JFrame {
             collabora.cancel(true);
             txtCode.getDocument().removeDocumentListener(textChange);
             btnJoin.setText("Join");
-            JoinDialog.accepted=false;
+            JoinDialog.accepted = false;
         }
     }//GEN-LAST:event_btnJoinActionPerformed
 
@@ -370,6 +389,54 @@ public class SharedIDE extends javax.swing.JFrame {
             salvaNome();
         }
     }//GEN-LAST:event_menuSalvaActionPerformed
+
+    /**
+     * Carica il file salvato online
+     * @param evt 
+     */
+    private void menuSalvaOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalvaOnlineActionPerformed
+        try {
+            System.setProperty("http.agent", "Chrome");
+            String url = "http://thumchant.altervista.org/ProgettoEsame/UserGet.php";
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            
+            String urlParameters = "username=tana";
+
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            //print result
+            System.out.println(response.toString());
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_menuSalvaOnlineActionPerformed
+
+    /**
+     * Scarica il file dalla piattaforma online e apre il contenuto
+     * @param evt 
+     */
+    private void menuApriOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuApriOnlineActionPerformed
+        OpenOnline dialogOpen=new OpenOnline(this,true,txtCode);
+        dialogOpen.setVisible(true);
+    }//GEN-LAST:event_menuApriOnlineActionPerformed
 
     /**
      * Salva il file, compila il codice e restituisce il messaggio del
@@ -573,11 +640,13 @@ public class SharedIDE extends javax.swing.JFrame {
     private javax.swing.JLabel lblNome;
     private javax.swing.JScrollPane linenumber;
     private javax.swing.JMenuItem menuApri;
+    private javax.swing.JMenuItem menuApriOnline;
     private javax.swing.JMenuItem menuCerca;
     private javax.swing.JMenuItem menuCommenta;
     private javax.swing.JMenuItem menuJavaDoc;
     private javax.swing.JMenuItem menuSalva;
     private javax.swing.JMenuItem menuSalvaNome;
+    private javax.swing.JMenuItem menuSalvaOnline;
     private javax.swing.JMenuItem menuSostituisci;
     private javax.swing.JTextArea txtCode;
     private javax.swing.JTextArea txtReturn;
