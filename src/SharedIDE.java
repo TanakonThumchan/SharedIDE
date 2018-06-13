@@ -2,8 +2,8 @@
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -11,9 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -22,6 +19,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 
 /**
  * Finestra pricipale del programma
@@ -392,49 +391,56 @@ public class SharedIDE extends javax.swing.JFrame {
 
     /**
      * Carica il file salvato online
-     * @param evt 
+     *
+     * @param evt
      */
     private void menuSalvaOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalvaOnlineActionPerformed
-        try {
-            System.setProperty("http.agent", "Chrome");
-            String url = "http://thumchant.altervista.org/ProgettoEsame/UserGet.php";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            
-            String urlParameters = "username=tana";
+        String server = "ftp.thumchant.altervista.org";
+        int port = 21;
+        String user = "thumchant";
+        String pass = "fidpivufdi60";
 
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
+        if (salva != false) {
+            salva();
+        } else {
+            salvaNome();
+        }
+        if (!file.equals("")) {
+            FTPClient ftpClient = new FTPClient();
+            try {
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
+                ftpClient.connect(server, port);
+                ftpClient.login(user, pass);
+                ftpClient.enterLocalPassiveMode();
 
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                // APPROACH #1: uploads first file using an InputStream
+                File uploadFile = new File(file);
+
+                String remoteFile = "/ProgettoEsame/File/"+uploadFile.getName();
+                InputStream inputStream = new FileInputStream(uploadFile);
+
+                System.out.println("Start uploading first file");
+                boolean done = ftpClient.storeFile(remoteFile, inputStream);
+                inputStream.close();
+                if (done) {
+                    System.out.println("The first file is uploaded successfully.");
+                }
+            } catch (IOException ex) {
+                System.out.println("Error: " + ex.getMessage());
+                ex.printStackTrace();
             }
-            in.close();
-
-            //print result
-            System.out.println(response.toString());
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_menuSalvaOnlineActionPerformed
 
     /**
      * Scarica il file dalla piattaforma online e apre il contenuto
-     * @param evt 
+     *
+     * @param evt
      */
     private void menuApriOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuApriOnlineActionPerformed
-        OpenOnline dialogOpen=new OpenOnline(this,true,txtCode);
+        OpenOnline dialogOpen = new OpenOnline(this, true, txtCode);
         dialogOpen.setVisible(true);
     }//GEN-LAST:event_menuApriOnlineActionPerformed
 
