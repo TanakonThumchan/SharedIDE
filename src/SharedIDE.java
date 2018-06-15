@@ -100,7 +100,7 @@ public class SharedIDE extends javax.swing.JFrame {
         lblNome = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        menuNew = new javax.swing.JMenuItem();
         menuApri = new javax.swing.JMenuItem();
         menuApriOnline = new javax.swing.JMenuItem();
         menuSalva = new javax.swing.JMenuItem();
@@ -111,6 +111,9 @@ public class SharedIDE extends javax.swing.JFrame {
         menuSostituisci = new javax.swing.JMenuItem();
         menuCommenta = new javax.swing.JMenuItem();
         menuJavaDoc = new javax.swing.JMenuItem();
+        User = new javax.swing.JMenu();
+        menuLogIn = new javax.swing.JMenuItem();
+        menuLogOut = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SharedIDE");
@@ -149,8 +152,13 @@ public class SharedIDE extends javax.swing.JFrame {
 
         jMenu1.setText("File");
 
-        jMenuItem4.setText("Nuovo");
-        jMenu1.add(jMenuItem4);
+        menuNew.setText("Nuovo");
+        menuNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuNewActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuNew);
 
         menuApri.setText("Apri");
         menuApri.addActionListener(new java.awt.event.ActionListener() {
@@ -224,6 +232,27 @@ public class SharedIDE extends javax.swing.JFrame {
         jMenu2.add(menuJavaDoc);
 
         jMenuBar1.add(jMenu2);
+
+        User.setText("User");
+
+        menuLogIn.setText("Log In");
+        menuLogIn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLogInActionPerformed(evt);
+            }
+        });
+        User.add(menuLogIn);
+
+        menuLogOut.setText("Log Out");
+        menuLogOut.setEnabled(false);
+        menuLogOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLogOutActionPerformed(evt);
+            }
+        });
+        User.add(menuLogOut);
+
+        jMenuBar1.add(User);
 
         setJMenuBar(jMenuBar1);
 
@@ -341,7 +370,7 @@ public class SharedIDE extends javax.swing.JFrame {
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
         if (click == false) {
             String nome = (String) JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null, null);
-            if (nome != null && !nome.equals("")) {
+            if (!nome.equals("")) {
                 click = true;
                 btnStart.setBackground(Color.GREEN);
                 lblNome.setText(nome);
@@ -395,42 +424,12 @@ public class SharedIDE extends javax.swing.JFrame {
      * @param evt
      */
     private void menuSalvaOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSalvaOnlineActionPerformed
-        String server = "ftp.thumchant.altervista.org";
-        int port = 21;
-        String user = "thumchant";
-        String pass = "fidpivufdi60";
-
-        if (salva != false) {
-            salva();
+        if (UserLogIn.log == true) {
+            salvaOnline();
         } else {
-            salvaNome();
-        }
-        if (!file.equals("")) {
-            FTPClient ftpClient = new FTPClient();
-            try {
-
-                ftpClient.connect(server, port);
-                ftpClient.login(user, pass);
-                ftpClient.enterLocalPassiveMode();
-
-                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                // APPROACH #1: uploads first file using an InputStream
-                File uploadFile = new File(file);
-
-                String remoteFile = "/ProgettoEsame/File/"+uploadFile.getName();
-                InputStream inputStream = new FileInputStream(uploadFile);
-
-                System.out.println("Start uploading first file");
-                boolean done = ftpClient.storeFile(remoteFile, inputStream);
-                inputStream.close();
-                if (done) {
-                    System.out.println("The first file is uploaded successfully.");
-                }
-            } catch (IOException ex) {
-                System.out.println("Error: " + ex.getMessage());
-                ex.printStackTrace();
-            }
+            JOptionPane.showConfirmDialog(null, "Eseguire prima l'autenticazione", "Autenticazione", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            autentication();
+            salvaOnline();
         }
     }//GEN-LAST:event_menuSalvaOnlineActionPerformed
 
@@ -440,9 +439,45 @@ public class SharedIDE extends javax.swing.JFrame {
      * @param evt
      */
     private void menuApriOnlineActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuApriOnlineActionPerformed
-        OpenOnline dialogOpen = new OpenOnline(this, true, txtCode);
-        dialogOpen.setVisible(true);
+        if (UserLogIn.log == true) {
+            OpenOnline dialogOpen = new OpenOnline(this, true, txtCode);
+            dialogOpen.setVisible(true);
+        } else {
+            JOptionPane.showConfirmDialog(null, "Eseguire prima l'autenticazione", "Autenticazione", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            autentication();
+            if (UserLogIn.log == true) {
+                OpenOnline dialogOpen = new OpenOnline(this, true, txtCode);
+                dialogOpen.setVisible(true);
+            }
+        }
     }//GEN-LAST:event_menuApriOnlineActionPerformed
+
+    /**
+     * Svuota la casella di testo per iniziare un file nuovo
+     *
+     * @param evt
+     */
+    private void menuNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuNewActionPerformed
+        txtCode.setText("");
+        salva = false;
+        file = "";
+    }//GEN-LAST:event_menuNewActionPerformed
+
+    /**
+     * Apre la finestra di log in
+     *
+     * @param evt
+     */
+    private void menuLogInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLogInActionPerformed
+        autentication();
+    }//GEN-LAST:event_menuLogInActionPerformed
+
+    private void menuLogOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLogOutActionPerformed
+        UserLogIn.log = false;
+        UserLogIn.user = "";
+        menuLogIn.setEnabled(true);
+        menuLogOut.setEnabled(false);
+    }//GEN-LAST:event_menuLogOutActionPerformed
 
     /**
      * Salva il file, compila il codice e restituisce il messaggio del
@@ -601,6 +636,64 @@ public class SharedIDE extends javax.swing.JFrame {
         }
     }
 
+    /**
+     * Carica il file salvato sulla piattaforma online
+     */
+    public void salvaOnline() {
+        String server = "ftp.thumchant.altervista.org";
+        int port = 21;
+        String user = "thumchant";
+        String pass = "fidpivufdi60";
+
+        if (salva != false) {
+            salva();
+        } else {
+            salvaNome();
+        }
+        if (!file.equals("")) {
+            FTPClient ftpClient = new FTPClient();
+            try {
+
+                ftpClient.connect(server, port);
+                ftpClient.login(user, pass);
+                ftpClient.enterLocalPassiveMode();
+
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                // APPROACH #1: uploads first file using an InputStream
+                File uploadFile = new File(file);
+
+                String remoteFile = "/ProgettoEsame/File/" + uploadFile.getName();
+                InputStream inputStream = new FileInputStream(uploadFile);
+
+                System.out.println("Start uploading first file");
+                boolean done = ftpClient.storeFile(remoteFile, inputStream);
+                inputStream.close();
+                if (done) {
+                    System.out.println("The first file is uploaded successfully.");
+                }
+            } catch (IOException ex) {
+                System.out.println("Error: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Verifica le credenziali dell'utente
+     */
+    public void autentication() {
+        UserLogIn dialog = new UserLogIn(this, true);
+        dialog.setVisible(true);
+        if (!dialog.isVisible()) {
+            if (UserLogIn.log == true) {
+                menuLogIn.setEnabled(false);
+                menuLogOut.setEnabled(true);
+                JOptionPane.showConfirmDialog(null, "Autenticazione riuscita", "Log in eseguita", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -635,13 +728,13 @@ public class SharedIDE extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu User;
     private javax.swing.JButton btnCompila;
     private javax.swing.JButton btnJoin;
     private javax.swing.JButton btnStart;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblNome;
     private javax.swing.JScrollPane linenumber;
@@ -650,6 +743,9 @@ public class SharedIDE extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuCerca;
     private javax.swing.JMenuItem menuCommenta;
     private javax.swing.JMenuItem menuJavaDoc;
+    private javax.swing.JMenuItem menuLogIn;
+    private javax.swing.JMenuItem menuLogOut;
+    private javax.swing.JMenuItem menuNew;
     private javax.swing.JMenuItem menuSalva;
     private javax.swing.JMenuItem menuSalvaNome;
     private javax.swing.JMenuItem menuSalvaOnline;

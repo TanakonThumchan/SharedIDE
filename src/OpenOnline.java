@@ -22,21 +22,23 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 /**
- * 
+ *
  */
 public class OpenOnline extends javax.swing.JDialog {
 
     private DefaultTableModel model;
     private JTextArea txtCode;
+
     /**
      * Creates new form OpenOnline
      */
-    public OpenOnline(java.awt.Frame parent, boolean modal,JTextArea txtCode) {
+    public OpenOnline(java.awt.Frame parent, boolean modal, JTextArea txtCode) {
         super(parent, modal);
         initComponents();
         model = (DefaultTableModel) tblFile.getModel();
-        this.txtCode=txtCode;
+        this.txtCode = txtCode;
     }
 
     /**
@@ -129,60 +131,65 @@ public class OpenOnline extends javax.swing.JDialog {
 
     /**
      * Scarica il file con dalla piattaforma online e apre il suo contenuto
-     * @param evt 
+     *
+     * @param evt
      */
     private void btnApriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApriActionPerformed
         int column = 0;
+        String fileName = "";
         int row = tblFile.getSelectedRow();
-        String fileName = tblFile.getModel().getValueAt(row, column).toString();
+        if (row >= 0) {
+            fileName = tblFile.getModel().getValueAt(row, column).toString();
+        }
         String server = "ftp.thumchant.altervista.org";
         int port = 21;
         String user = "thumchant";
         String pass = "fidpivufdi60";
- 
-        FTPClient ftpClient = new FTPClient();
-        try {
- 
-            ftpClient.connect(server, port);
-            ftpClient.login(user, pass);
-            ftpClient.enterLocalPassiveMode();
-            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-            
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
-            fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            fileChooser.setFileFilter(new FileNameExtensionFilter("File java", "java"));
-            fileChooser.setSelectedFile(new File(fileName));
-            int resul = fileChooser.showSaveDialog(null);
-            if (resul == fileChooser.APPROVE_OPTION) {            
-                //String remoteFile = "/ProgettoEsame/File/"+fileName;
-                String remoteFile= "/ProgettoEsame/File/Listening.java";
-                File downloadFile= fileChooser.getSelectedFile();
-                OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
-                boolean success = ftpClient.retrieveFile(remoteFile, outputStream);
-                outputStream.close();
+        if (!fileName.equals("")) {
+            FTPClient ftpClient = new FTPClient();
+            try {
 
-                if (success) {
-                    System.out.println("File #1 has been downloaded successfully.");
-                    try {
-                        BufferedReader reader = new BufferedReader(new FileReader(downloadFile));
-                        String line = null;
-                        txtCode.setText(null);
-                        while ((line = reader.readLine()) != null) {
-                            txtCode.append(line + System.lineSeparator());
+                ftpClient.connect(server, port);
+                ftpClient.login(user, pass);
+                ftpClient.enterLocalPassiveMode();
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Seleziona la dictory per il salvataggio");
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fileChooser.setFileFilter(new FileNameExtensionFilter("File java", "java"));
+                fileChooser.setSelectedFile(new File(fileName));
+                int resul = fileChooser.showSaveDialog(null);
+                if (resul == fileChooser.APPROVE_OPTION) {
+                    //String remoteFile = "/ProgettoEsame/File/"+fileName;
+                    String remoteFile = "/ProgettoEsame/File/Listening.java";
+                    File downloadFile = fileChooser.getSelectedFile();
+                    OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
+                    boolean success = ftpClient.retrieveFile(remoteFile, outputStream);
+                    outputStream.close();
+
+                    if (success) {
+                        System.out.println("File #1 has been downloaded successfully.");
+                        try {
+                            BufferedReader reader = new BufferedReader(new FileReader(downloadFile));
+                            String line = null;
+                            txtCode.setText(null);
+                            while ((line = reader.readLine()) != null) {
+                                txtCode.append(line + System.lineSeparator());
+                            }
+                            this.dispose();
+                        } catch (IOException e) {
+                            JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
                         }
-                        this.dispose();
-                    } catch (IOException e) {
-                        JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        System.out.println("Can't download file");
                     }
-                }else {
-                    System.out.println("Can't download file");
                 }
+
+            } catch (IOException ex) {
+                System.out.println("Error: " + ex.getMessage());
+                ex.printStackTrace();
             }
-            
-        } catch (IOException ex) {
-            System.out.println("Error: " + ex.getMessage());
-            ex.printStackTrace();
         }
     }//GEN-LAST:event_btnApriActionPerformed
 
@@ -198,8 +205,8 @@ public class OpenOnline extends javax.swing.JDialog {
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            
-            String urlParameters = "username=tana&mode=pc";
+
+            String urlParameters = "username=" + UserLogIn.user + "&mode=pc";
 
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
@@ -209,21 +216,21 @@ public class OpenOnline extends javax.swing.JDialog {
 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             String inputLine;
-            StringBuffer response = new StringBuffer();
+            StringBuilder response = new StringBuilder();
 
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
             in.close();
-            
+
             //JSONObject jOb = new JSONObject(response.toString());
             JSONArray jas = new JSONArray(response.toString());
             System.out.println(jas.toString());
-            for(int i=0;i<jas.length();i++){
+            for (int i = 0; i < jas.length(); i++) {
                 JSONObject rec = jas.getJSONObject(i);
                 String fileName = rec.getString("nome");
                 String dataModifica = rec.getString("data");
-                model.addRow(new Object[]{fileName,dataModifica});
+                model.addRow(new Object[]{fileName, dataModifica});
             }
             //System.out.println(jOb.getString("nome"));
             //print result
