@@ -161,14 +161,17 @@ public class OpenOnline extends javax.swing.JDialog {
                 fileChooser.setSelectedFile(new File(fileName));
                 int resul = fileChooser.showSaveDialog(null);
                 if (resul == fileChooser.APPROVE_OPTION) {
-                    //String remoteFile = "/ProgettoEsame/File/"+fileName;
-                    String remoteFile = "/ProgettoEsame/File/Listening.java";
+                    String remoteFile = "/ProgettoEsame/File/"+fileName;
+                    //String remoteFile = "/ProgettoEsame/File/Listening.java";
                     File downloadFile = fileChooser.getSelectedFile();
                     OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
                     boolean success = ftpClient.retrieveFile(remoteFile, outputStream);
                     outputStream.close();
 
                     if (success) {
+                        SharedIDE.salva=true;
+                        SharedIDE.change=false;
+                        SharedIDE.file=downloadFile.getAbsolutePath();
                         System.out.println("File #1 has been downloaded successfully.");
                         try {
                             BufferedReader reader = new BufferedReader(new FileReader(downloadFile));
@@ -200,7 +203,7 @@ public class OpenOnline extends javax.swing.JDialog {
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         try {
             System.setProperty("http.agent", "Chrome");
-            String url = "http://thumchant.altervista.org/ProgettoEsame/UserGet.php";
+            String url = "http://thumchant.altervista.org/ProgettoEsame/UserGetFileList.php";
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("POST");

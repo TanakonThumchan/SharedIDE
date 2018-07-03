@@ -194,6 +194,24 @@ public class MyDocumentListener implements DocumentListener {
             Logger.getLogger(MyDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public void userJoin(String nome){
+        ByteBuffer buffer;
+        buffer=ByteBuffer.allocate(256);
+        buffer.put(0, (byte) 7);
+        buffer.position(1);
+        buffer.put(nome.getBytes(Charset.forName("UTF-16BE")));
+        sendBuffer(buffer);
+    }
+    
+    public void userLeave(String nome){
+        ByteBuffer buffer;
+        buffer=ByteBuffer.allocate(256);
+        buffer.put(0, (byte) 6);
+        buffer.position(1);
+        buffer.put(nome.getBytes(Charset.forName("UTF-16BE")));
+        sendBuffer(buffer);
+    }
 
     /**
      * Stampa il tipo di modifica effettuata

@@ -9,8 +9,10 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.SwingWorker;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -26,20 +28,23 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
     private DefaultCaret caret;
     public static int port;
     public MulticastSocket s;
+    private DefaultTableModel model;
     /**
      * @param txtCode Casela di testo
      */
-    public Listening(JTextArea txtCode) {
+    public Listening(JTextArea txtCode,JTable userList) {
         port = 3000;
         temp = txtCode;
         caret = (DefaultCaret) txtCode.getCaret();
         caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
+        model= (DefaultTableModel) userList.getModel();
         portCheck();
     }
     
-    public Listening(JTextArea txtCode,int port){
+    public Listening(JTextArea txtCode,int port,JTable userList){
         this.port = port;
         temp = txtCode;
+        model= (DefaultTableModel) userList.getModel();
         caret = (DefaultCaret) txtCode.getCaret();
         caret.setUpdatePolicy(DefaultCaret.UPDATE_WHEN_ON_EDT);
     }
@@ -81,20 +86,37 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
             byte[] buffer = new byte[256];
             int offset = message.getInt(1);
             byte lenght = message.get(5);
-
+            String name="";
+            String ip="";
             /*tempo=message.replaceAll("\0","");
             offset=Integer.parseInt(tempo.substring(1,4));
             lenght=Integer.parseInt(tempo.substring(4,7));*/
             buffer = Arrays.copyOfRange(message.array(), 6, 6 + (lenght * 2));
             tempo = new String(buffer, Charset.forName("UTF-16BE"));
             Thread.currentThread().setName("CIAO");
-            if (message.get(0) == 0) {
-                temp.insert(tempo, offset);
-            } else if (message.get(0) == 1) {
-                temp.replaceRange("", offset, offset + lenght);
-            } else if (message.get(0) == 9) {
-                responseCheck();
+            
+            switch (message.get(0)) {
+                case 0:
+                    temp.insert(tempo, offset);
+                    break;
+                case 1:
+                    temp.replaceRange("", offset, offset + lenght);
+                    break;
+                case 6:
+                    name = new String(Arrays.copyOfRange(message.array(), 1, 255), Charset.forName("UTF-16BE"));
+                    userLeave(name);
+                    break;
+                case 7:
+                    name = new String(Arrays.copyOfRange(message.array(), 1, 255), Charset.forName("UTF-16BE"));
+                    userAdd(name);
+                    break;
+                case 9:
+                    responseCheck();
+                    break;
+                default:
+                    break;
             }
+            
             //JOptionPane.showMessageDialog(null, tempo);
             //pos = temp.getCaretPosition();
             //temp.setText(tempo);
@@ -104,6 +126,27 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
         }
     }
 
+    /**
+     * Rimuove l'utente dalla tabella
+     * @param name
+     */
+    public void userLeave(String name){
+        for  (int i=0;i<model.getRowCount();i++){
+            if (model.getValueAt(i, 0).equals(name))
+            {
+                model.removeRow(i);
+            }
+        }
+    }
+    
+    /**
+     * Aggiunte l'utente alla tabella
+     * @param name
+     */
+    public void userAdd(String name){
+        model.addRow(new Object[]{name});
+    }
+    
     /**
      * Invia un messaggio per verificare se il canale è libero
      */

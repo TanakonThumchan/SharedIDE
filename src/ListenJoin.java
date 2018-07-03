@@ -27,6 +27,7 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
     String msg;
     JTable temp = new JTable();
     DefaultTableModel model;
+    DefaultTableModel userList;
     JTextArea code;
     public Socket socket;
     public ServerSocket listener;
@@ -40,9 +41,11 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
      * disponibile
      * @param txtCode Casella di testo per scrivere il codice
      * @param parent finestra di selezione elenco delle collaborazione
+     * @param userList Lista degli utenti
      */
-    public ListenJoin(JTable tblCanali, JTextArea txtCode, JDialog parent) {
+    public ListenJoin(JTable tblCanali, JTextArea txtCode, JDialog parent,JTable userList) {
         this.parent = parent;
+        this.userList=(DefaultTableModel) userList.getModel();
         temp = tblCanali;
         code = txtCode;
         model = (DefaultTableModel) temp.getModel();
@@ -115,6 +118,14 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                                 Thread.currentThread().setName("Main");
                             }
                         } while (buf.get(0) == 8 && lenght == 125);
+                        in.read(buffer);
+                        buf = ByteBuffer.wrap(buffer);
+                        while(buf.get(0) == 7) {
+                            name = new String(Arrays.copyOfRange(buf.array(), 1, 255), Charset.forName("UTF-16BE"));
+                            userList.addRow(new Object[]{name});
+                            in.read(buffer);
+                            buf = ByteBuffer.wrap(buffer);
+                        }
                         parent.dispose();
                     }
                     else{
@@ -125,7 +136,7 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                 }
                 socket.close();
             } catch (IOException ex) {
-                System.out.println(ex+"ddssdf");
+                System.out.println(ex+" ListenJoin");
                 Logger.getLogger(ListenJoin.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

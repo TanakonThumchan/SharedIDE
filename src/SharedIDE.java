@@ -2,6 +2,7 @@
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,6 +12,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -18,6 +23,8 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -35,8 +42,9 @@ public class SharedIDE extends javax.swing.JFrame {
     private JMenuItem copia;
     private JMenuItem incolla;
     private JMenuItem commenta;
-    private boolean salva;
-    private String file;
+    public static boolean salva;
+    public static boolean change;
+    public static String file;
     private Listening collabora;
     private MyDocumentListener textChange;
     private Thread lisPub;
@@ -77,13 +85,14 @@ public class SharedIDE extends javax.swing.JFrame {
         popup.add(incolla);
         popup.add(commenta);
         txtCode.setComponentPopupMenu(popup);
+        pnlUser.setVisible(false);
         /*Thread listenG=new Thread(new ListenGlobal(txtCode));
         listenG.start();*/
  /*test = new Listening(txtCode);
         test.execute();*/
         tln = new TextLineNumber(txtCode);
         linenumber.setRowHeaderView(tln);
-
+        addChangeListener();
     }
 
     @SuppressWarnings("unchecked")
@@ -98,6 +107,9 @@ public class SharedIDE extends javax.swing.JFrame {
         linenumber = new javax.swing.JScrollPane();
         txtCode = new javax.swing.JTextArea();
         lblNome = new javax.swing.JLabel();
+        pnlUser = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblUserList = new javax.swing.JTable();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         menuNew = new javax.swing.JMenuItem();
@@ -117,6 +129,11 @@ public class SharedIDE extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SharedIDE");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         btnCompila.setText("Compila");
         btnCompila.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -148,7 +165,32 @@ public class SharedIDE extends javax.swing.JFrame {
         txtCode.setRows(5);
         linenumber.setViewportView(txtCode);
 
-        lblNome.setToolTipText("");
+        lblNome.setText("  ");
+
+        tblUserList.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "User"
+            }
+        ));
+        jScrollPane1.setViewportView(tblUserList);
+        tblUserList.getAccessibleContext().setAccessibleParent(this);
+
+        javax.swing.GroupLayout pnlUserLayout = new javax.swing.GroupLayout(pnlUser);
+        pnlUser.setLayout(pnlUserLayout);
+        pnlUserLayout.setHorizontalGroup(
+            pnlUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+        );
+        pnlUserLayout.setVerticalGroup(
+            pnlUserLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlUserLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
 
         jMenu1.setText("File");
 
@@ -263,32 +305,38 @@ public class SharedIDE extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 637, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
                     .addComponent(linenumber))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnCompila, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
-                    .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnJoin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblNome, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(37, 37, 37))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                        .addComponent(btnCompila, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblNome, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnlUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(88, 88, 88))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(linenumber, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblNome, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2)
+                        .addComponent(lblNome)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnCompila, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(4, 4, 4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pnlUser, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 223, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(linenumber)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(6, 6, 6))
         );
@@ -337,72 +385,28 @@ public class SharedIDE extends javax.swing.JFrame {
      */
     private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
         if (JoinDialog.accepted == false) {
-            JoinDialog j = new JoinDialog(this, true, txtCode);
+            JoinDialog j = new JoinDialog(this, true, txtCode, tblUserList);
             j.setVisible(true);
             if (!j.isVisible()) {
                 if (JoinDialog.accepted == true) {
+                    pnlUser.setVisible(true);
                     btnJoin.setText("Disconnect");
-                    collabora = new Listening(txtCode, ListenJoin.port);
+                    collabora = new Listening(txtCode, ListenJoin.port, tblUserList);
                     collabora.execute();
                     textChange = new MyDocumentListener(txtCode, ListenJoin.port);
                     txtCode.getDocument().addDocumentListener(textChange);
+                    textChange.userJoin(JoinDialog.nome);
                 }
             }
         } else {
             collabora.s.close();
             collabora.cancel(true);
+            textChange.userLeave(JoinDialog.nome);
             txtCode.getDocument().removeDocumentListener(textChange);
             btnJoin.setText("Join");
             JoinDialog.accepted = false;
         }
     }//GEN-LAST:event_btnJoinActionPerformed
-
-    /**
-     * Crea la collaborazione e resta in ascolto per le richieste di
-     * partecipazione degli altri host. Viene chiesto l'utente di inserire il
-     * nome della collaborazione.<br>
-     * Se la collaborazione è gia attiva allora viene disattivata.
-     *
-     * @param evt evento click dell'opzione Start
-     * @see ListenPublic
-     * @see ListenRequest
-     */
-    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-        if (click == false) {
-            String nome = (String) JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null, null);
-            if (!nome.equals("")) {
-                click = true;
-                btnStart.setBackground(Color.GREEN);
-                lblNome.setText(nome);
-
-                lisPubRn = new ListenPublic(nome);
-                lisReqRn = new ListenRequest(txtCode);
-
-                lisPub = new Thread(lisPubRn);
-                lisReguest = new Thread(lisReqRn);
-
-                collabora = new Listening(txtCode);
-                collabora.execute();
-                lisPub.start();
-                lisReguest.start();
-                textChange = new MyDocumentListener(txtCode, collabora.port);
-                txtCode.getDocument().addDocumentListener(textChange);
-            }
-        } else {
-            collabora.s.close();
-            collabora.cancel(true);
-            lisPubRn.s.close();
-            try {
-                lisReqRn.listener.close();
-            } catch (IOException ex) {
-                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            txtCode.getDocument().removeDocumentListener(textChange);
-            lblNome.setText(null);
-            click = false;
-            btnStart.setBackground(null);
-        }
-    }//GEN-LAST:event_btnStartActionPerformed
 
     /**
      * Salva il file aperto<br>
@@ -480,44 +484,157 @@ public class SharedIDE extends javax.swing.JFrame {
     }//GEN-LAST:event_menuLogOutActionPerformed
 
     /**
+     * Crea la collaborazione e resta in ascolto per le richieste di
+     * partecipazione degli altri host. Viene chiesto l'utente di inserire il
+     * nome della collaborazione.<br>
+     * Se la collaborazione è gia attiva allora viene disattivata.
+     *
+     * @param evt evento click dell'opzione Start
+     * @see ListenPublic
+     * @see ListenRequest
+     */
+    private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
+        if (click == false) {
+            if (UserLogIn.log == false) {
+                int resul = JOptionPane.showConfirmDialog(null, "Avviare la collaborazione offline?", "Log in non eseguita", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                if (resul == JOptionPane.NO_OPTION) {
+                    autentication();
+                }
+            }
+            if (salva != false) {
+                salva();
+            } else {
+                salvaNome();
+            }
+            if (salva == true) {
+                String nome = (String) JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null, null);
+                if (!nome.equals("")) {
+                    if (UserLogIn.log == false) {
+                        JOptionPane.showConfirmDialog(null, "Collaborazione avviata in modalità offline", "Log in non eseguita", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        salvaOnline();
+                    }
+                    pnlUser.setVisible(true);
+                    click = true;
+                    btnStart.setBackground(Color.GREEN);
+                    lblNome.setText(nome);
+
+                    lisPubRn = new ListenPublic(nome);
+                    lisReqRn = new ListenRequest(txtCode, tblUserList);
+
+                    lisPub = new Thread(lisPubRn);
+                    lisReguest = new Thread(lisReqRn);
+
+                    collabora = new Listening(txtCode, tblUserList);
+                    collabora.execute();
+                    lisPub.start();
+                    lisReguest.start();
+                    textChange = new MyDocumentListener(txtCode, collabora.port);
+                    txtCode.getDocument().addDocumentListener(textChange);
+                }
+            }
+        } else {
+            collabora.s.close();
+            collabora.cancel(true);
+            lisPubRn.s.close();
+            try {
+                lisReqRn.listener.close();
+            } catch (IOException ex) {
+                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            txtCode.getDocument().removeDocumentListener(textChange);
+            lblNome.setText(null);
+            click = false;
+            btnStart.setBackground(null);
+        }
+    }//GEN-LAST:event_btnStartActionPerformed
+
+    /**
+     * Azione prima della chiusura del programma
+     * @param evt 
+     */
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        if (change==true){
+            int resul = JOptionPane.showConfirmDialog(null, "Salvare prima di uscire?", "Salvataggio",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (resul == JOptionPane.YES_OPTION) {
+                if (salva==true){
+                    salva();
+                }else{
+                    salvaNome();
+                }
+            }
+        }
+        if (JoinDialog.accepted == true){
+            textChange.userLeave(JoinDialog.nome);
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    public void addChangeListener(){
+        txtCode.getDocument().addDocumentListener(new DocumentListener() {      
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                change=true;
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                change=true;
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                change=true;
+            }
+      });
+    }
+    
+    /**
      * Salva il file, compila il codice e restituisce il messaggio del
      * compilatore
      *
      * @param evt evento click dell'opzione Compila
      */
     private void btnCompilaMouseClicked(java.awt.event.MouseEvent evt) {
-        String buffer = new String();
-        String temp = "";
-        try (PrintWriter out = new PrintWriter("filename.java")) {
-            buffer = txtCode.getText();
-            out.println(buffer);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            buffer = new String();
-            String command = "cmd /c javac Filename.java";
-            Process child = Runtime.getRuntime().exec(command);
+        if (salva == true) {
+            txtReturn.setText("");
+            String buffer = new String();
+            String temp = "";
+            try (PrintWriter out = new PrintWriter(file)) {
+                buffer = txtCode.getText();
+                out.print(buffer);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                buffer = new String();
+                String command = "cmd /c javac " + file;
+                Process child = Runtime.getRuntime().exec(command);
 //            OutputStream out = child.getOutputStream();
-            InputStream in = child.getInputStream();
-            BufferedReader readd = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            while ((buffer = readd.readLine()) != null) {
-                temp += buffer; // lettura risposta del cmd
+                InputStream in = child.getInputStream();
+                BufferedReader readd = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+                while ((buffer = readd.readLine()) != null) {
+                    temp += buffer; // lettura risposta del cmd
+                }
+                InputStream stderr = child.getErrorStream(); // Ottengo lo stream dell'errore
+                BufferedReader br = new BufferedReader(new InputStreamReader(stderr));
+                buffer = new String();
+                while ((buffer = br.readLine()) != null) {
+                    System.out.println(buffer);
+                    txtReturn.append(buffer + System.lineSeparator());
+                }
+                int exitVal = child.waitFor(); // Se exitVal=0 tutto ok se è diverso da 0 c'è qualche errore
+                System.out.println("Process exitValue: " + exitVal);
+                if (exitVal==0){
+                    txtReturn.setText("BUILD SUCCESSFUL");
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
             }
-            InputStream stderr = child.getErrorStream(); // Ottengo lo stream dell'errore
-            BufferedReader br = new BufferedReader(new InputStreamReader(stderr));
-            buffer = new String();
-            while ((buffer = br.readLine()) != null) {
-                System.out.println(buffer);
-                txtReturn.append(buffer + System.lineSeparator());
-            }
-            int exitVal = child.waitFor(); // Se exitVal=0 tutto ok se è diverso da 0 c'è qualche errore
-            System.out.println("Process exitValue: " + exitVal);
-            JOptionPane.showMessageDialog(null, temp);
-        } catch (IOException ex) {
-            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        else {
+            salvaNome();
         }
     }
 
@@ -553,6 +670,7 @@ public class SharedIDE extends javax.swing.JFrame {
                 }
                 file = fileToOpen.getAbsolutePath();
                 salva = true;
+                change=false;
             } catch (IOException e) {
                 JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -601,6 +719,7 @@ public class SharedIDE extends javax.swing.JFrame {
             out.write(txtCode.getText());
             out.close();
             salva = true;
+            change=false;
         } catch (IOException ex) {
             JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -630,6 +749,7 @@ public class SharedIDE extends javax.swing.JFrame {
                 out.close();
                 salva = true;
                 file = fileToSave.getAbsolutePath();
+                change=false;
             } catch (IOException ex) {
                 JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -651,30 +771,63 @@ public class SharedIDE extends javax.swing.JFrame {
             salvaNome();
         }
         if (!file.equals("")) {
-            FTPClient ftpClient = new FTPClient();
             try {
-
-                ftpClient.connect(server, port);
-                ftpClient.login(user, pass);
-                ftpClient.enterLocalPassiveMode();
-
-                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-
-                // APPROACH #1: uploads first file using an InputStream
+                System.setProperty("http.agent", "Chrome");
+                String url = "http://thumchant.altervista.org/ProgettoEsame/UserPutFile.php";
+                URL obj = new URL(url);
+                HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 File uploadFile = new File(file);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                String urlParameters = "username=" + UserLogIn.user + "&filename=" + uploadFile.getName() + "&lastChange=" + sdf.format(uploadFile.lastModified());
+                System.out.println(urlParameters);
 
-                String remoteFile = "/ProgettoEsame/File/" + uploadFile.getName();
-                InputStream inputStream = new FileInputStream(uploadFile);
+                con.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.writeBytes(urlParameters);
+                wr.flush();
+                wr.close();
 
-                System.out.println("Start uploading first file");
-                boolean done = ftpClient.storeFile(remoteFile, inputStream);
-                inputStream.close();
-                if (done) {
-                    System.out.println("The first file is uploaded successfully.");
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuilder response = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
                 }
+                in.close();
+                if (!response.equals("NO")) {
+                    FTPClient ftpClient = new FTPClient();
+                    try {
+
+                        ftpClient.connect(server, port);
+                        ftpClient.login(user, pass);
+                        ftpClient.enterLocalPassiveMode();
+
+                        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                        // APPROACH #1: uploads first file using an InputStream
+                        String remoteFile = "/ProgettoEsame/File/" + uploadFile.getName();
+                        InputStream inputStream = new FileInputStream(uploadFile);
+
+                        System.out.println("Start uploading first file");
+                        boolean done = ftpClient.storeFile(remoteFile, inputStream);
+                        inputStream.close();
+                        if (done) {
+                            System.out.println("The first file is uploaded successfully.");
+                        }
+                    } catch (IOException ex) {
+                        System.out.println("Error: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showConfirmDialog(null, "L'utente non ha i permessi per salvare questo file online", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                System.out.println("Error: " + ex.getMessage());
-                ex.printStackTrace();
+                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -735,6 +888,7 @@ public class SharedIDE extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblNome;
     private javax.swing.JScrollPane linenumber;
@@ -750,6 +904,8 @@ public class SharedIDE extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuSalvaNome;
     private javax.swing.JMenuItem menuSalvaOnline;
     private javax.swing.JMenuItem menuSostituisci;
+    private javax.swing.JPanel pnlUser;
+    private javax.swing.JTable tblUserList;
     private javax.swing.JTextArea txtCode;
     private javax.swing.JTextArea txtReturn;
     // End of variables declaration//GEN-END:variables

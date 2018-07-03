@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 
@@ -30,6 +31,7 @@ public class JoinDialog extends javax.swing.JDialog {
     private ListenJoin thread;
     private DefaultTableModel model;
     public static boolean accepted;
+    public static String nome;
 
     /**
      * Inizializza i componenti grafici e stabilisce una connessione <br>
@@ -38,16 +40,21 @@ public class JoinDialog extends javax.swing.JDialog {
      * @param parent Finestra madre
      * @param modal Modalità di apertura
      * @param txtCode Casella di testo
+     * @param userList Lista degli utenti
      * @see ListenJoin
      * @see MulticastSocket
      */
-    public JoinDialog(java.awt.Frame parent, boolean modal, JTextArea txtCode) {
+    public JoinDialog(java.awt.Frame parent, boolean modal, JTextArea txtCode,JTable userList) {
         super(parent, modal);
         initComponents();
         timer = new Timer();
-        thread = new ListenJoin(tblCanali, txtCode,this);
+        thread = new ListenJoin(tblCanali, txtCode,this,userList);
         thread.execute();
         model = (DefaultTableModel) tblCanali.getModel();
+        accepted=false;
+        if (UserLogIn.log == true){
+            txtNome.setText(UserLogIn.user);
+        }
         try {
             group = InetAddress.getByName("228.5.6.7");
             s = new MulticastSocket(6789);
@@ -188,7 +195,7 @@ public class JoinDialog extends javax.swing.JDialog {
      * @see Socket
      */
     private void btnEntraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntraActionPerformed
-        String nome = txtNome.getText();
+        nome = txtNome.getText();
         if (!nome.equals("")) {
             int column = 1;
             int row = tblCanali.getSelectedRow();
