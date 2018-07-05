@@ -37,10 +37,10 @@ public class ListenRequest implements Runnable {
      * @param txtCode Casella di testo
      * @param userList Lista degli utenti in collaborazione
      */
-    public ListenRequest(JTextArea txtCode,JTable userList) {
+    public ListenRequest(JTextArea txtCode, JTable userList) {
         Thread.currentThread().setName("ListenRequest");
         temp = txtCode;
-        model= (DefaultTableModel) userList.getModel();
+        model = (DefaultTableModel) userList.getModel();
     }
 
     /**
@@ -69,11 +69,11 @@ public class ListenRequest implements Runnable {
                     ip = socket.getInetAddress().toString().replace("/", "");
                     name = new String(Arrays.copyOfRange(buf.array(), 31, 255), Charset.forName("UTF-16BE"));
                 }
-                int resul = JOptionPane.showConfirmDialog(null, name, "Richiesta", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                int resul = JOptionPane.showConfirmDialog(null, name + " vorrebbe accedere alla collaborazione", "Richiesta", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 Socket client = new Socket(ip, 9090);
                 DataOutputStream out = new DataOutputStream(client.getOutputStream());
                 if (resul == JOptionPane.YES_OPTION) {
-                    if (UserLogIn.log == true) {
+                    /*if (UserLogIn.log == true) {
                         try {
                             System.setProperty("http.agent", "Chrome");
                             String url = "http://thumchant.altervista.org/ProgettoEsame/UserAddToCollaboration.php";
@@ -84,7 +84,7 @@ public class ListenRequest implements Runnable {
                             
                             File uploadFile = new File(SharedIDE.file);
                             String urlParameters = "username="+UserLogIn.user+"&userAdd="+name+"&fileName="+uploadFile.getName();
-                            JOptionPane.showConfirmDialog(null, urlParameters, "Richiesta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            //JOptionPane.showConfirmDialog(null, urlParameters, "Richiesta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
                             con.setDoOutput(true);
                             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
                             wr.writeBytes(urlParameters);
@@ -98,13 +98,13 @@ public class ListenRequest implements Runnable {
                             while ((inputLine = serverRespose.readLine()) != null) {
                                 response.append(inputLine);
                             }
-                            JOptionPane.showConfirmDialog(null, response.toString(), "Richiesta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            //JOptionPane.showConfirmDialog(null, response.toString(), "Richiesta", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE);
                             in.close();
                         } catch (IOException ex) {
                             System.out.println("Error: " + ex.getMessage());
                             ex.printStackTrace();
                         }
-                    }
+                    }*/
                     System.out.println("Utente accettato");
                     //model.addRow(new Object[]{name,ip});
                     String text = temp.getText();
@@ -121,7 +121,7 @@ public class ListenRequest implements Runnable {
                         }*/
                         buf.putInt(Listening.port);
                         out.write(buf.array());
-
+                        Thread.sleep(100);
                         if (lenght <= 125) {
                             buf = ByteBuffer.allocate((lenght * 2) + 6);
                             buf.put(0, (byte) 8);
@@ -130,34 +130,39 @@ public class ListenRequest implements Runnable {
                             buf.position(6);
                             buf.put(text.getBytes(Charset.forName("UTF-16BE")));
                             out.write(buf.array());
-                            
+                            Thread.sleep(100);
+
                         } else {
                             while ((offset + 125) < lenght) {
                                 buf = ByteBuffer.allocate(256);
                                 buf.put(0, (byte) 8);
-                                buf.putInt(1, 0);
+                                buf.putInt(1, offset);
                                 buf.put(5, (byte) 125);
+                                buf.position(6);
                                 buf.put((text.substring(offset, offset + 125)).getBytes(Charset.forName("UTF-16BE")));
                                 out.write(buf.array());
+                                Thread.sleep(100);
                                 offset = offset + 125;
                             }
                             lenght = lenght - offset;
                             if (lenght > 0) {
                                 buf = ByteBuffer.allocate((lenght * 2) + 6);
                                 buf.put(0, (byte) 8);
-                                buf.putInt(1, 0);
+                                buf.putInt(1, offset);
                                 buf.put(5, (byte) lenght);
                                 buf.position(6);
                                 buf.put((text.substring(offset, offset + lenght)).getBytes(Charset.forName("UTF-16BE")));;
-                                out.write(buf.array());                                
+                                out.write(buf.array());
+                                Thread.sleep(100);
                             }
                         }
-                        for (int i=0;i<model.getRowCount();i++){
+                        for (int i = 0; i < model.getRowCount(); i++) {
                             buf = ByteBuffer.allocate(256);
                             buf.put(0, (byte) 7);
                             buf.position(1);
                             buf.put((model.getValueAt(i, 0).toString()).getBytes(Charset.forName("UTF-16BE")));
-                            out.write(buf.array()); 
+                            out.write(buf.array());
+                            Thread.sleep(100);
                         }
                         buf = ByteBuffer.allocate(256);
                         buf.put(0, (byte) 0);
@@ -176,9 +181,10 @@ public class ListenRequest implements Runnable {
                     out.close();
                     client.close();
                 }
+
             }
         } catch (IOException ex) {
-            Logger.getLogger(ListenRequest.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(ListenRequest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

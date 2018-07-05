@@ -54,6 +54,7 @@ public class JoinDialog extends javax.swing.JDialog {
         accepted=false;
         if (UserLogIn.log == true){
             txtNome.setText(UserLogIn.user);
+            txtNome.setEditable(false);
         }
         try {
             group = InetAddress.getByName("228.5.6.7");
@@ -84,6 +85,7 @@ public class JoinDialog extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Collaborazioni Attive");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
@@ -125,6 +127,7 @@ public class JoinDialog extends javax.swing.JDialog {
         });
         jScrollPane2.setViewportView(tblCanali);
 
+        txtNome.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
         jScrollPane1.setViewportView(txtNome);
 
         jLabel1.setText("Nickname: ");
@@ -134,22 +137,20 @@ public class JoinDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap(179, Short.MAX_VALUE)
+                        .addGap(0, 169, Short.MAX_VALUE)
                         .addComponent(btnEntra)
                         .addGap(18, 18, 18)
-                        .addComponent(btnAnnulla)))
+                        .addComponent(btnAnnulla))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

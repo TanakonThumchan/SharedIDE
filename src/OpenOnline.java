@@ -56,6 +56,7 @@ public class OpenOnline extends javax.swing.JDialog {
         btnAnnulla = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("File Salvati Online");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -169,8 +170,7 @@ public class OpenOnline extends javax.swing.JDialog {
                     outputStream.close();
 
                     if (success) {
-                        SharedIDE.salva=true;
-                        SharedIDE.change=false;
+                        SharedIDE.salva=true;                        
                         SharedIDE.file=downloadFile.getAbsolutePath();
                         System.out.println("File #1 has been downloaded successfully.");
                         try {
@@ -180,6 +180,7 @@ public class OpenOnline extends javax.swing.JDialog {
                             while ((line = reader.readLine()) != null) {
                                 txtCode.append(line + System.lineSeparator());
                             }
+                            SharedIDE.change=false;
                             this.dispose();
                         } catch (IOException e) {
                             JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);

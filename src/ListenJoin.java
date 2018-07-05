@@ -43,9 +43,9 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
      * @param parent finestra di selezione elenco delle collaborazione
      * @param userList Lista degli utenti
      */
-    public ListenJoin(JTable tblCanali, JTextArea txtCode, JDialog parent,JTable userList) {
+    public ListenJoin(JTable tblCanali, JTextArea txtCode, JDialog parent, JTable userList) {
         this.parent = parent;
-        this.userList=(DefaultTableModel) userList.getModel();
+        this.userList = (DefaultTableModel) userList.getModel();
         temp = tblCanali;
         code = txtCode;
         model = (DefaultTableModel) temp.getModel();
@@ -104,7 +104,7 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                     port = buf.getInt(1);
                     in.read(buffer);
                     buf = ByteBuffer.wrap(buffer);
-                    if (buf.get(0) == 8 && port>0) {
+                    if (buf.get(0) == 8 && port > 0) {
                         code.setText("");
                         do {
                             lenght = buf.get(5);
@@ -118,25 +118,27 @@ public class ListenJoin extends SwingWorker<Void, Socket> {
                                 Thread.currentThread().setName("Main");
                             }
                         } while (buf.get(0) == 8 && lenght == 125);
-                        in.read(buffer);
-                        buf = ByteBuffer.wrap(buffer);
-                        while(buf.get(0) == 7) {
+                        Thread.sleep(100);
+                        /*in.read(buffer);
+                        buf = ByteBuffer.wrap(buffer);*/
+                        while (buf.get(0) == 7) {
                             name = new String(Arrays.copyOfRange(buf.array(), 1, 255), Charset.forName("UTF-16BE"));
                             userList.addRow(new Object[]{name});
                             in.read(buffer);
                             buf = ByteBuffer.wrap(buffer);
                         }
                         parent.dispose();
-                    }
-                    else{
+                    } else {
                         JOptionPane.showConfirmDialog(null, "Richiesta rifiutata", "Rifiutata", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-                        JoinDialog.accepted=false;
+                        JoinDialog.accepted = false;
                         parent.dispose();
                     }
                 }
                 socket.close();
             } catch (IOException ex) {
-                System.out.println(ex+" ListenJoin");
+                System.out.println(ex + " ListenJoin");
+                Logger.getLogger(ListenJoin.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
                 Logger.getLogger(ListenJoin.class.getName()).log(Level.SEVERE, null, ex);
             }
         }

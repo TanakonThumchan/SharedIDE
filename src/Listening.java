@@ -67,7 +67,7 @@ public class Listening extends SwingWorker<Void, ByteBuffer> {
                 publish(bytebu);
             }
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Errr");
+            //JOptionPane.showMessageDialog(null, "Errr");
             //Logger.getLogger(Listening.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

@@ -75,7 +75,7 @@ public class ListenPublic implements Runnable {
             }
         } catch (IOException ex) {
             //JOptionPane.showMessageDialog(null, "Errr");
-            Logger.getLogger(ListenPublic.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(ListenPublic.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

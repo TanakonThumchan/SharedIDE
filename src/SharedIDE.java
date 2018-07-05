@@ -26,6 +26,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -352,7 +353,7 @@ public class SharedIDE extends javax.swing.JFrame {
      * @see SearchDialog
      */
     private void menuCercaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCercaActionPerformed
-        SearchDialog s = new SearchDialog(this, true, txtCode);
+        SearchDialog s = new SearchDialog(this, false, txtCode);
         s.setVisible(true);
     }//GEN-LAST:event_menuCercaActionPerformed
 
@@ -373,7 +374,7 @@ public class SharedIDE extends javax.swing.JFrame {
      * @see ReplaceDialog
      */
     private void menuSostituisciActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSostituisciActionPerformed
-        ReplaceDialog r = new ReplaceDialog(this, true, txtCode);
+        ReplaceDialog r = new ReplaceDialog(this, false, txtCode);
         r.setVisible(true);
     }//GEN-LAST:event_menuSostituisciActionPerformed
 
@@ -384,27 +385,33 @@ public class SharedIDE extends javax.swing.JFrame {
      * @see JoinDialog
      */
     private void btnJoinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnJoinActionPerformed
-        if (JoinDialog.accepted == false) {
-            JoinDialog j = new JoinDialog(this, true, txtCode, tblUserList);
-            j.setVisible(true);
-            if (!j.isVisible()) {
-                if (JoinDialog.accepted == true) {
-                    pnlUser.setVisible(true);
-                    btnJoin.setText("Disconnect");
-                    collabora = new Listening(txtCode, ListenJoin.port, tblUserList);
-                    collabora.execute();
-                    textChange = new MyDocumentListener(txtCode, ListenJoin.port);
-                    txtCode.getDocument().addDocumentListener(textChange);
-                    textChange.userJoin(JoinDialog.nome);
+        if (click == false) {
+            DefaultTableModel model = (DefaultTableModel) tblUserList.getModel();
+            if (JoinDialog.accepted == false) {
+                JoinDialog j = new JoinDialog(this, true, txtCode, tblUserList);
+                j.setVisible(true);
+                if (!j.isVisible()) {
+                    if (JoinDialog.accepted == true) {
+                        model.addRow(new Object[]{JoinDialog.nome});
+                        pnlUser.setVisible(true);
+                        btnJoin.setText("Disconnect");
+                        collabora = new Listening(txtCode, ListenJoin.port, tblUserList);
+                        collabora.execute();
+                        textChange = new MyDocumentListener(txtCode, ListenJoin.port);
+                        txtCode.getDocument().addDocumentListener(textChange);
+                        textChange.userJoin(JoinDialog.nome);
+                    }
                 }
+            } else {
+                model.setRowCount(0);
+                pnlUser.setVisible(false);
+                collabora.s.close();
+                collabora.cancel(true);
+                textChange.userLeave(JoinDialog.nome);
+                txtCode.getDocument().removeDocumentListener(textChange);
+                btnJoin.setText("Join");
+                JoinDialog.accepted = false;
             }
-        } else {
-            collabora.s.close();
-            collabora.cancel(true);
-            textChange.userLeave(JoinDialog.nome);
-            txtCode.getDocument().removeDocumentListener(textChange);
-            btnJoin.setText("Join");
-            JoinDialog.accepted = false;
         }
     }//GEN-LAST:event_btnJoinActionPerformed
 
@@ -464,6 +471,7 @@ public class SharedIDE extends javax.swing.JFrame {
     private void menuNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuNewActionPerformed
         txtCode.setText("");
         salva = false;
+        change=false;
         file = "";
     }//GEN-LAST:event_menuNewActionPerformed
 
@@ -494,100 +502,123 @@ public class SharedIDE extends javax.swing.JFrame {
      * @see ListenRequest
      */
     private void btnStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartActionPerformed
-        if (click == false) {
-            if (UserLogIn.log == false) {
-                int resul = JOptionPane.showConfirmDialog(null, "Avviare la collaborazione offline?", "Log in non eseguita", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-                if (resul == JOptionPane.NO_OPTION) {
-                    autentication();
-                }
-            }
-            if (salva != false) {
-                salva();
-            } else {
-                salvaNome();
-            }
-            if (salva == true) {
-                String nome = (String) JOptionPane.showInputDialog(this, "Inserisci il nome", "Nome", JOptionPane.PLAIN_MESSAGE, null, null, null);
-                if (!nome.equals("")) {
-                    if (UserLogIn.log == false) {
-                        JOptionPane.showConfirmDialog(null, "Collaborazione avviata in modalità offline", "Log in non eseguita", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        salvaOnline();
+        DefaultTableModel model = (DefaultTableModel) tblUserList.getModel();
+        if (JoinDialog.accepted == false) {
+            if (click == false) {
+                if (UserLogIn.log == false) {
+                    int resul = JOptionPane.showConfirmDialog(null, "Avviare la collaborazione offline?", "Log in non eseguita", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if (resul == JOptionPane.NO_OPTION) {
+                        autentication();
+                        if (UserLogIn.log == true) {
+                            if (salva != false) {
+                                salva();
+                            } else {
+                                salvaNome();
+                            }
+                        }
+                    } else if (resul == JOptionPane.YES_OPTION) {
+                        if (salva != false) {
+                            salva();
+                        } else {
+                            salvaNome();
+                        }
                     }
-                    pnlUser.setVisible(true);
-                    click = true;
-                    btnStart.setBackground(Color.GREEN);
-                    lblNome.setText(nome);
-
-                    lisPubRn = new ListenPublic(nome);
-                    lisReqRn = new ListenRequest(txtCode, tblUserList);
-
-                    lisPub = new Thread(lisPubRn);
-                    lisReguest = new Thread(lisReqRn);
-
-                    collabora = new Listening(txtCode, tblUserList);
-                    collabora.execute();
-                    lisPub.start();
-                    lisReguest.start();
-                    textChange = new MyDocumentListener(txtCode, collabora.port);
-                    txtCode.getDocument().addDocumentListener(textChange);
                 }
+                if (salva == true) {
+                    String nome = (String) JOptionPane.showInputDialog(this, "Inserisci il nome della collaborazione", "Nome della collaborazione", JOptionPane.PLAIN_MESSAGE, null, null, null);
+                    if (!nome.equals("")) {
+                        if (UserLogIn.log == false) {
+                            String username="";
+                            JOptionPane.showConfirmDialog(null, "Collaborazione avviata in modalità offline", "Log in non eseguita", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                            do{
+                                username= (String) JOptionPane.showInputDialog(this, "Inserisci il nome dell'utente", "Nome dell'utente", JOptionPane.PLAIN_MESSAGE, null, null, null);
+                            }while(username==null || username.equals(""));
+                            model.addRow(new Object[]{username});
+                        } else {
+                            model.addRow(new Object[]{UserLogIn.user});
+                            salvaOnline();
+                        }
+                        pnlUser.setVisible(true);
+                        click = true;
+                        btnStart.setBackground(Color.GREEN);
+                        lblNome.setText(nome);
+
+                        lisPubRn = new ListenPublic(nome);
+                        lisReqRn = new ListenRequest(txtCode, tblUserList);
+
+                        lisPub = new Thread(lisPubRn);
+                        lisReguest = new Thread(lisReqRn);
+
+                        collabora = new Listening(txtCode, tblUserList);
+                        collabora.execute();
+                        lisPub.start();
+                        lisReguest.start();
+                        textChange = new MyDocumentListener(txtCode, collabora.port);
+                        txtCode.getDocument().addDocumentListener(textChange);
+                    }
+                }
+            } else {
+                model.setRowCount(0);
+                pnlUser.setVisible(false);
+                collabora.s.close();
+                collabora.cancel(true);
+                lisPubRn.s.close();
+                try {
+                    lisReqRn.listener.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                txtCode.getDocument().removeDocumentListener(textChange);
+                lblNome.setText(null);
+                click = false;
+                btnStart.setBackground(null);
             }
-        } else {
-            collabora.s.close();
-            collabora.cancel(true);
-            lisPubRn.s.close();
-            try {
-                lisReqRn.listener.close();
-            } catch (IOException ex) {
-                Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            txtCode.getDocument().removeDocumentListener(textChange);
-            lblNome.setText(null);
-            click = false;
-            btnStart.setBackground(null);
         }
     }//GEN-LAST:event_btnStartActionPerformed
 
     /**
      * Azione prima della chiusura del programma
-     * @param evt 
+     *
+     * @param evt
      */
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (change==true){
-            int resul = JOptionPane.showConfirmDialog(null, "Salvare prima di uscire?", "Salvataggio",  JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (change == true) {
+            int resul = JOptionPane.showConfirmDialog(null, "Salvare prima di uscire?", "Salvataggio", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (resul == JOptionPane.YES_OPTION) {
-                if (salva==true){
+                if (salva == true) {
                     salva();
-                }else{
+                } else {
                     salvaNome();
                 }
             }
         }
-        if (JoinDialog.accepted == true){
+        if (JoinDialog.accepted == true) {
             textChange.userLeave(JoinDialog.nome);
         }
     }//GEN-LAST:event_formWindowClosing
 
-    public void addChangeListener(){
-        txtCode.getDocument().addDocumentListener(new DocumentListener() {      
+    public void addChangeListener() {
+        txtCode.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                change=true;
+                change = true;
+                txtReturn.setText("");
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                change=true;
+                change = true;
+                txtReturn.setText("");
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                change=true;
+                change = true;
+                txtReturn.setText("");
             }
-      });
+        });
     }
-    
+
     /**
      * Salva il file, compila il codice e restituisce il messaggio del
      * compilatore
@@ -624,7 +655,7 @@ public class SharedIDE extends javax.swing.JFrame {
                 }
                 int exitVal = child.waitFor(); // Se exitVal=0 tutto ok se è diverso da 0 c'è qualche errore
                 System.out.println("Process exitValue: " + exitVal);
-                if (exitVal==0){
+                if (exitVal == 0) {
                     txtReturn.setText("BUILD SUCCESSFUL");
                 }
             } catch (IOException ex) {
@@ -632,8 +663,7 @@ public class SharedIDE extends javax.swing.JFrame {
             } catch (InterruptedException ex) {
                 Logger.getLogger(SharedIDE.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        else {
+        } else {
             salvaNome();
         }
     }
@@ -670,7 +700,7 @@ public class SharedIDE extends javax.swing.JFrame {
                 }
                 file = fileToOpen.getAbsolutePath();
                 salva = true;
-                change=false;
+                change = false;
             } catch (IOException e) {
                 JOptionPane.showConfirmDialog(null, "Apertura del file fallita", "Errore di apertura", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -719,7 +749,7 @@ public class SharedIDE extends javax.swing.JFrame {
             out.write(txtCode.getText());
             out.close();
             salva = true;
-            change=false;
+            change = false;
         } catch (IOException ex) {
             JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
         }
@@ -749,7 +779,7 @@ public class SharedIDE extends javax.swing.JFrame {
                 out.close();
                 salva = true;
                 file = fileToSave.getAbsolutePath();
-                change=false;
+                change = false;
             } catch (IOException ex) {
                 JOptionPane.showConfirmDialog(null, "Salvataggio del file fallito", "Errore di salvataggio", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
@@ -815,7 +845,7 @@ public class SharedIDE extends javax.swing.JFrame {
                         boolean done = ftpClient.storeFile(remoteFile, inputStream);
                         inputStream.close();
                         if (done) {
-                            System.out.println("The first file is uploaded successfully.");
+                            JOptionPane.showConfirmDialog(null, "Salvataggio online completato", "Salvataggio online", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (IOException ex) {
                         System.out.println("Error: " + ex.getMessage());
